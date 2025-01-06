@@ -13,6 +13,9 @@ import { ContractModule } from './contract/contract.module';
 import { PaymentModule } from './contract/payment/payment.module';
 import { RequirementModule } from './requirement/requirement.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from './mail/mailer.module';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -39,9 +42,37 @@ import { MongooseModule } from '@nestjs/mongoose';
     CategoryModule,
     ContractModule,
     PaymentModule,
-    RequirementModule
+    RequirementModule,
+    MailModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async () => ({
+        transport: {
+          host: process.env.MAILDEV_INCOMING_HOST,
+          port: parseInt(process.env.MAILDEV_INCOMING_PASS),
+          // ignoreTLS: true,
+          secure: false,
+          auth: {
+            user: process.env.MAILDEV_INCOMING_USER,
+            pass: process.env.MAILDEV_INCOMING_PASS,
+          },
+        },
+        defaults: {
+          from: '"No Reply" <no-reply@localhost>',
+        },
+        preview: true,
+        template: {
+          dir: process.cwd() + '/src/mail/templates/',
+          adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

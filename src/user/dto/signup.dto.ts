@@ -38,5 +38,4 @@ export class SignUpDto {
 
     @IsString()
     readonly lessor: string
-
 }

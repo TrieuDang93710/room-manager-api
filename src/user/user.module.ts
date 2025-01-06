@@ -12,6 +12,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { TenantSchema } from './schemas/tenant.schema';
 import { LessorSchema } from './schemas/lessor.schema';
 import { RoomSchema } from 'src/room/schemas/room.schema';
+import { RefreshTokenService } from 'src/helpers/refreshToken';
+import { GenerateTokenService } from 'src/helpers/token';
 
 @Module({
   imports: [
@@ -34,11 +36,11 @@ import { RoomSchema } from 'src/room/schemas/room.schema';
       { name: 'Address', schema: AddressSchema },
       { name: 'Tenant', schema: TenantSchema },
       { name: 'Lessor', schema: LessorSchema },
-      { name: 'Room', schema: RoomSchema }
+      { name: 'Room', schema: RoomSchema },
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy],
+  providers: [UserService, JwtStrategy, RefreshTokenService, GenerateTokenService],
   exports: [JwtStrategy, PassportModule]
 })
 export class UserModule { }

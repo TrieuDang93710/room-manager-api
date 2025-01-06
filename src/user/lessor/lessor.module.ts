@@ -14,9 +14,9 @@ import { UserSchema } from "../schemas/user.schema";
     imports: [
         UserModule,
         MongooseModule.forFeature([
-            { name: 'Lessor', schema: LessorSchema },
             { name: 'Tenant', schema: TenantSchema },
-            { name: 'User', schema: UserSchema }
+            { name: 'Lessor', schema: LessorSchema },
+            { name: 'User', schema: UserSchema },
         ])
     ],
     providers: [LessorService],
