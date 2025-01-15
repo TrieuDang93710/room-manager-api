@@ -1,15 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get } from "@nestjs/common";
-import { PaymentService } from "./payment.service";
-import { Payment } from "./schemas/payment.schema";
+import { Controller, Get } from '@nestjs/common';
+import { PaymentService } from './payment.service';
 @Controller('payment')
 export class PaymentController {
-    constructor(
-        private paymentService: PaymentService
-    ) { }
+  constructor(private paymentService: PaymentService) {}
 
-    @Get()
-    async getPayments(): Promise<Payment[]> {
-        return this.paymentService.findAll()
-    }
+  @Get()
+  async getPayments() {
+    return this.paymentService.findAll();
+  }
 }
