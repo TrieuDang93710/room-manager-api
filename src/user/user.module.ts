@@ -2,23 +2,26 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from './schemas/user.schema';
-import { AddressSchema } from 'src/address/schemas/address.schema';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { TenantSchema } from './schemas/tenant.schema';
-import { LessorSchema } from './schemas/lessor.schema';
-import { RoomSchema } from 'src/room/schemas/room.schema';
 import { RefreshTokenService } from 'src/helpers/refreshToken';
 import { GenerateTokenService } from 'src/helpers/token';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity';
+import { ApplicantEntity } from './entities/applicant.entity';
+import { ManagerEntity } from './entities/manager.entity';
+import { AddressEntity } from 'src/address/entities/address.entity';
+import { PostEntity } from 'src/posts/entities/post.entity';
+import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { RequireEntity } from 'src/requires/entities/require.entity';
+import { PaymentEntity } from 'src/payment/entities/payment.entity';
 
 @Module({
   imports: [
     PassportModule.register({
-      defaultStrategy: 'jwt'
+      defaultStrategy: 'jwt',
     }),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -26,21 +29,31 @@ import { GenerateTokenService } from 'src/helpers/token';
         return {
           secret: config.get<string>('JWT_SECRET'),
           signOptions: {
-            expiresIn: config.get<string | number>('JWT_EXPIRES')
-          }
-        }
-      }
+            expiresIn: config.get<string | number>('JWT_EXPIRES'),
+          },
+        };
+      },
     }),
-    MongooseModule.forFeature([
-      { name: 'User', schema: UserSchema },
-      { name: 'Address', schema: AddressSchema },
-      { name: 'Tenant', schema: TenantSchema },
-      { name: 'Lessor', schema: LessorSchema },
-      { name: 'Room', schema: RoomSchema },
+    TypeOrmModule.forFeature([
+      UserEntity,
+      AddressEntity,
+      ApplicantEntity,
+      ManagerEntity,
+      PostEntity,
+      ApplyEntity,
+      PaymentEntity,
+      RequireEntity
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy, RefreshTokenService, GenerateTokenService],
-  exports: [JwtStrategy, PassportModule]
+  providers: [
+    UserService,
+    JwtStrategy,
+    RefreshTokenService,
+    GenerateTokenService,
+    ApplicantEntity,
+    ManagerEntity,
+  ],
+  exports: [JwtStrategy, PassportModule],
 })
-export class UserModule { }
+export class UserModule {}

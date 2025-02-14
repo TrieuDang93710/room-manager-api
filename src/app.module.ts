@@ -5,17 +5,27 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AddressModule } from './address/address.module';
-import { TenantModule } from './user/tenant/tenant.module';
+import { ApplicantModule } from './user/applicant/applicant.module';
 import { LessorModule } from './user/lessor/lessor.module';
-import { RoomModule } from './room/room.module';
+import { PostModule } from './posts/post.module';
 import { CategoryModule } from './category/category.module';
-import { ContractModule } from './contract/contract.module';
-import { PaymentModule } from './contract/payment/payment.module';
-import { RequirementModule } from './requirement/requirement.module';
+import { ApplyModule } from './apply/apply.module';
+import { RequireModule } from './requires/require.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './mail/mailer.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { AuthModule } from './auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { dataSourceOptions } from 'db/data-source';
+import { RatingModule } from './rating/rating.module';
+import { MessageModule } from './message/message.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { SalaryModule } from './salary/salary.module';
+import { ServicePackageModule } from './service_package/service_package.module';
+import { PaymentModule } from './payment/payment.module';
+import { WorkPlaceModule } from './work_place/work_place.module';
 
 @Module({
   imports: [
@@ -24,26 +34,19 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5432,
-    //   username: 'postgres',
-    //   password: 'sa123',
-    //   database: 'typeorm-room-manager-db',
-    //   entities: [],
-    //   synchronize: true,
-    // }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
+    AuthModule,
     AddressModule,
-    TenantModule,
+    ApplicantModule,
     LessorModule,
-    RoomModule,
+    PostModule,
     CategoryModule,
-    ContractModule,
+    ApplyModule,
     PaymentModule,
-    RequirementModule,
+    RequireModule,
     MailModule,
+    RatingModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
@@ -71,8 +74,13 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       }),
     }),
     MailerModule,
+    MessageModule,
+    CloudinaryModule,
+    SalaryModule,
+    ServicePackageModule,
+    WorkPlaceModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CloudinaryService],
 })
 export class AppModule {}

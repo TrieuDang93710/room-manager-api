@@ -1,41 +1,20 @@
 /* eslint-disable prettier/prettier */
-import { IsBoolean, IsNotEmpty, IsString } from "class-validator"
-
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Role } from 'src/shared/enums/role.enum';
 export class SignUpDto {
+  @IsNotEmpty()
+  @IsString({ message: 'number of letter is not less 3 letter' })
+  readonly username: string;
 
-    @IsNotEmpty()
-    @IsString()
-    readonly username: string
+  @IsNotEmpty()
+  @IsString()
+  readonly email: string;
 
-    @IsString()
-    readonly avatar: string
+  @IsNotEmpty()
+  @IsString({ message: 'password must be more than 6 letter' })
+  readonly password: string;
 
-    @IsNotEmpty()
-    @IsString()
-    readonly password: string
-
-    @IsNotEmpty()
-    @IsString()
-    readonly email: string
-
-    @IsString()
-    readonly phoneNumber: string
-
-    @IsBoolean()
-    readonly blocked: false
-
-    @IsString()
-    readonly role: string[]
-
-    @IsString()
-    readonly token: string
-
-    @IsString()
-    readonly address: string
-
-    @IsString()
-    readonly tenant: string
-
-    @IsString()
-    readonly lessor: string
+  @IsArray()
+  @IsEnum(Role, { each: true })
+  readonly role: Role[];
 }

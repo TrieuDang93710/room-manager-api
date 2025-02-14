@@ -1,0 +1,429 @@
+/* eslint-disable prettier/prettier */
+import {
+  HttpStatus,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Query } from 'express-serve-static-core';
+import { RatingPostDto } from './dto/rating.dto';
+import { ApiResponseDto } from 'src/dto/response.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PostEntity } from './entities/post.entity';
+import { Like, Repository } from 'typeorm';
+import { CreatePostDto } from './dto/create.dto';
+import { CategoryEntity } from 'src/category/entities/category.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { RatingEntity } from 'src/rating/entities/rating.entity';
+import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { Role } from 'src/shared/enums/role.enum';
+import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+
+@Injectable()
+export class PostService {
+  constructor(
+    @InjectRepository(PostEntity)
+    private readonly postRepository: Repository<PostEntity>,
+    @InjectRepository(CategoryEntity)
+    private readonly categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(RatingEntity)
+    private readonly ratingRepository: Repository<RatingEntity>,
+    @InjectRepository(ManagerEntity)
+    private readonly managerRepository: Repository<ManagerEntity>,
+    @InjectRepository(ApplicantEntity)
+    private readonly applicantRepository: Repository<ApplicantEntity>,
+  ) {}
+
+  async findAll(query: Query): Promise<ApiResponseDto<any>> {
+    const resPerPage = Number(query.pageSize) || 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = resPerPage * (currentPage - 1);
+
+    const keyword = query.keyword
+      ? {
+          title: Like(`%${query.keyword}%`),
+        }
+      : {};
+
+    const [result, total] = await this.postRepository.findAndCount({
+      where: keyword,
+      relations: {
+        type_of_post: true,
+        ratings: {
+          userId: true,
+        },
+        createBy: {
+          user: true,
+        },
+      },
+      select: {
+        ratings: {
+          id: true,
+          star: true,
+          comment: true,
+          userId: {
+            username: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      take: resPerPage,
+      skip: skip,
+    });
+
+    const totalPages = Math.ceil(total / resPerPage);
+
+    return {
+      statusCode: HttpStatus.OK,
+      statusMessage: 'Get all post successfully',
+      data: {
+        result: result,
+        totalItems: total,
+        totalPages: totalPages,
+        currentPage: currentPage,
+      },
+    };
+  }
+
+  async findById(id: number): Promise<ApiResponseDto<PostEntity>> {
+    const room = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        type_of_post: true,
+        createBy: true,
+      },
+    });
+    if (!room) {
+      throw new NotFoundException('Not found room by id');
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      statusMessage: 'Get a room successfully',
+      data: room,
+    };
+  }
+
+  async create(
+    createRoomDto: CreatePostDto,
+    user: UserEntity,
+  ): Promise<ApiResponseDto<PostEntity>> {
+    if (user.role[0] !== Role.MANAGER) {
+      throw new NotAcceptableException(
+        'You must be manager role, created new room',
+      );
+    }
+    const findUser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: { manager: true },
+    });
+    const findCategoryAlready = await this.categoryRepository.findOne({
+      where: {
+        id: createRoomDto.typeOfRoom,
+      },
+      relations: {
+        posts: true,
+      },
+    });
+
+    if (!findCategoryAlready) {
+      throw new NotFoundException('Not found room of category');
+    }
+
+    const findCreateByUser = await this.managerRepository.findOne({
+      where: {
+        id: findUser.manager.id,
+      },
+      relations: {
+        posts: true,
+      },
+    });
+
+    const newRoom = this.postRepository.create({
+      title: createRoomDto.name,
+      description: createRoomDto.description,
+      type_of_post: findCategoryAlready,
+      createBy: findCreateByUser,
+    });
+    await this.postRepository.save(newRoom);
+
+    if (!findCategoryAlready.posts) {
+      findCategoryAlready.posts = [newRoom];
+    } else {
+      const roomAlreadyExisted = findCategoryAlready.posts.some(
+        (roomIntiCate) => roomIntiCate.id === newRoom.id,
+      );
+      if (!roomAlreadyExisted) {
+        findCategoryAlready.posts = [...findCategoryAlready.posts, newRoom];
+      }
+    }
+
+    await this.categoryRepository.save(findCategoryAlready);
+
+    if (!findCreateByUser.posts) {
+      findCreateByUser.posts = [newRoom];
+    } else {
+      const userAlreadyExisted = findCreateByUser.posts.some(
+        (roomIntoUser) => roomIntoUser.id === newRoom.id,
+      );
+      if (!userAlreadyExisted) {
+        findCreateByUser.posts = [...findCreateByUser.posts, newRoom];
+      }
+    }
+
+    await this.managerRepository.save(findCreateByUser);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      statusMessage: 'Create new room successfully',
+      data: newRoom,
+    };
+  }
+
+  async updateById(id: number, room: any): Promise<ApiResponseDto<PostEntity>> {
+    const findRoomAlready = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!findRoomAlready) {
+      throw new NotFoundException('Not found room by id');
+    }
+    const data: any = await this.postRepository.update(id, room);
+    return {
+      statusCode: HttpStatus.OK,
+      statusMessage: 'Update successfully',
+      data: data,
+    };
+  }
+
+  async deleteById(id: number): Promise<ApiResponseDto<any>> {
+    const findRoomAlready: PostEntity = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!findRoomAlready) {
+      throw new NotFoundException('Not found room by id');
+    }
+
+    const category: any = await this.categoryRepository.findBy({
+      id: findRoomAlready.type_of_post.id,
+    });
+
+    const result = await this.postRepository.delete(id);
+
+    if (!category.posts) {
+      throw new NotFoundException('Not room into categories');
+    }
+
+    category.posts.map((room: { id: number }) => {
+      if (room.id === findRoomAlready.id) {
+        category.room.pop(room);
+      }
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      statusMessage: 'Delete successfully',
+      data: result,
+    };
+  }
+
+  async rating(
+    ratingPostDto: RatingPostDto,
+    user: UserEntity,
+  ): Promise<ApiResponseDto<PostEntity>> {
+    const findUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!ratingPostDto) {
+      throw new NotFoundException('Not found any comment.');
+    }
+
+    const findRoom = await this.postRepository.findOne({
+      where: { id: ratingPostDto.roomId },
+    });
+
+    if (!findRoom) {
+      throw new NotFoundException('Not found any room.');
+    }
+
+    const ratedStar: RatingEntity = this.ratingRepository.create({
+      ...ratingPostDto,
+      star: ratingPostDto.star,
+      comment: ratingPostDto.comment,
+      post: findRoom,
+      userId: findUser,
+    });
+
+    await this.ratingRepository.save(ratedStar);
+
+    // const alreadyRated = findRoom.ratings.find(
+    //   (user) => user.userId.id === findUser.id,
+    // );
+
+    findRoom.ratings = findRoom.ratings
+      ? [...findRoom.ratings, ratedStar]
+      : [ratedStar];
+
+    await this.postRepository.save(findRoom);
+
+    const totalR = findRoom.ratings.length;
+    const ratingSum = findRoom.ratings
+      .map((item) => item.star)
+      .reduce((prev, curr) => prev + curr, 0);
+    const actualRating = Math.round(ratingSum / totalR);
+
+    findRoom.totalRating = actualRating;
+
+    await this.postRepository.save(findRoom);
+
+    return {
+      statusCode: HttpStatus.OK,
+      statusMessage: 'Rating successfully',
+      data: findRoom,
+    };
+  }
+
+  async addToWishlist(id: number, user: UserEntity): Promise<ApplicantEntity> {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+      },
+      relations: {
+        applicant: true,
+        manager: true,
+      },
+    });
+    console.log('user: =>', findUser);
+
+    const findRoom = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    const tenantId = findUser.applicant;
+
+    const findTenantModel = await this.applicantRepository.findOne({
+      where: { id: tenantId.id },
+      relations: { wishlists: true },
+    });
+
+    const wishlists = findTenantModel.wishlists;
+
+    const alreadyWishlist = findTenantModel.wishlists.some(
+      (room) => room.id === findRoom.id,
+    );
+
+    if (wishlists === null) {
+      findTenantModel.wishlists.push(findRoom);
+      return this.applicantRepository.save(findTenantModel);
+    } else {
+      if (alreadyWishlist) {
+        findTenantModel.wishlists = findTenantModel.wishlists.filter(
+          (room) => room.id !== findRoom.id,
+        );
+        return this.applicantRepository.save(findTenantModel);
+      } else {
+        findTenantModel.wishlists.push(findRoom);
+        return this.applicantRepository.save(findTenantModel);
+      }
+    }
+  }
+
+  async saves(id: number, user: UserEntity): Promise<ApplicantEntity> {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+      },
+      relations: {
+        applicant: true,
+        manager: true,
+      },
+    });
+
+    const findRoom = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    const tenantId = findUser.applicant;
+
+    const findTenantModel = await this.applicantRepository.findOne({
+      where: { id: tenantId.id },
+      relations: { saves: true },
+    });
+
+    const saves = findTenantModel.saves;
+
+    const alreadySave = findTenantModel.saves.some(
+      (room) => room.id === findRoom.id,
+    );
+
+    if (saves === null) {
+      findTenantModel.saves.push(findRoom);
+      return this.applicantRepository.save(findTenantModel);
+    } else {
+      if (alreadySave) {
+        findTenantModel.saves = findTenantModel.saves.filter(
+          (room) => room.id !== findRoom.id,
+        );
+        return this.applicantRepository.save(findTenantModel);
+      } else {
+        findTenantModel.saves.push(findRoom);
+        return this.applicantRepository.save(findTenantModel);
+      }
+    }
+  }
+
+  async follower(id: number, user: UserEntity): Promise<ApplicantEntity> {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+      },
+      relations: {
+        applicant: true,
+        manager: true,
+      },
+    });
+
+    const follower = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    const tenantId = findUser.applicant;
+
+    const findTenantModel = await this.applicantRepository.findOne({
+      where: { id: tenantId.id },
+      relations: { followers: true },
+    });
+
+    const followers = findTenantModel.followers;
+
+    const alreadyFollower = findTenantModel.followers.some(
+      (fl) => fl.id === follower.id,
+    );
+
+    if (followers === null) {
+      findTenantModel.followers.push(follower);
+      return this.applicantRepository.save(findTenantModel);
+    } else {
+      if (alreadyFollower) {
+        findTenantModel.followers = findTenantModel.followers.filter(
+          (fl) => fl.id !== follower.id,
+        );
+        return this.applicantRepository.save(findTenantModel);
+      } else {
+        findTenantModel.followers.push(follower);
+        return this.applicantRepository.save(findTenantModel);
+      }
+    }
+  }
+}

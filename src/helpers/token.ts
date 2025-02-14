@@ -1,25 +1,25 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GenerateTokenService {
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
   async token(
-    userId: string,
+    userId: number,
     username: string,
     role: string,
   ): Promise<{ token: string }> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     const salt = 10;
 
     if (!user) {
@@ -32,16 +32,9 @@ export class GenerateTokenService {
       role: role,
     });
 
-    const updateUser = await this.userModel.findByIdAndUpdate(
-      user._id,
-      {
-        token: await bcrypt.hash(token, salt),
-      },
-      {
-        new: true,
-      },
-    );
-    updateUser.save();
+    await this.userRepository.update(userId, {
+      token: await bcrypt.hash(token, salt),
+    });
 
     return { token };
   }

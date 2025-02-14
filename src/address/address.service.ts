@@ -1,19 +1,23 @@
 /* eslint-disable prettier/prettier */
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Address } from './schemas/address.schema';
-import mongoose from 'mongoose';
 import { ApiResponseDto } from 'src/dto/response.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AddressEntity } from './entities/address.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AddressService {
   constructor(
-    @InjectModel(Address.name)
-    private addressModel: mongoose.Model<Address>,
+    @InjectRepository(AddressEntity)
+    private readonly addressRepository: Repository<AddressEntity>,
   ) {}
 
-  async findAll(): Promise<ApiResponseDto<Address[]>> {
-    const data = await this.addressModel.find();
+  async findAll(): Promise<ApiResponseDto<AddressEntity[]>> {
+    const data = await this.addressRepository.find({
+      relations: {
+        user: true,
+      },
+    });
     return {
       statusCode: HttpStatus.OK,
       statusMessage: 'Get all address successfully',

@@ -1,7 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create.dto';
+import { UpdateCategoryDto } from './dto/update.dto';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('category')
 export class CategoryController {
@@ -16,7 +27,28 @@ export class CategoryController {
   }
 
   @Get()
-  async getCategories() {
-    return this.categoryService.findAll();
+  async getCategories(
+    @Query()
+    query: ExpressQuery,
+  ) {
+    return this.categoryService.findAll(query);
+  }
+
+  @Get('/:id')
+  async getCategoryById(@Param('id') id: number) {
+    return this.categoryService.findById(id);
+  }
+
+  @Patch('/:id')
+  async updateCategoryById(
+    @Param('id') id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoryService.updateById(id, updateCategoryDto);
+  }
+
+  @Delete('/:id')
+  async deleteCategoryById(@Param('id') id: number) {
+    return this.categoryService.deleteById(id);
   }
 }

@@ -1,63 +1,32 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
-  Post,
+  Patch,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { SignUpDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from './guards/role.guard';
 import { Roles } from './decorators/role.decorator';
 import { Role } from '../shared/enums/role.enum';
 import { MailerService } from '@nestjs-modules/mailer';
-import { JwtService } from '@nestjs/jwt';
+import { UpdateUserDto } from './dto/update.dto';
+import { DecentralizeDto } from './dto/decentralize.dto';
 
 @Controller('user')
 export class UserController {
   constructor(
     private userService: UserService,
-    private jwtService: JwtService,
     private readonly mailerService: MailerService,
   ) {}
 
-  @Post('/signup')
-  async signUp(
-    @Body()
-    signUpDto: SignUpDto,
-  ) {
-    return this.userService.signup(signUpDto);
-  }
-
-  @Post('/activate-account/:userId')
-  @Roles(Role.ADMIN, Role.LESSOR, Role.TENANT)
-  async activateAccount(@Param('userId') userId: string) {
-    return this.userService.activateAccount(userId);
-  }
-
-  @Post('/login')
-  async login(
-    @Body()
-    loginDto: LoginDto,
-  ) {
-    return this.userService.login(loginDto);
-  }
-
-  @Post('/refresh-token')
-  async refreshToken(@Body() { refreshToken }: { refreshToken: string }) {
-    if (!refreshToken) {
-      throw new BadRequestException('Refresh token is required.');
-    }
-    return this.userService.verifyRefreshToken(refreshToken);
-  }
-
   @Get()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER, Role.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard)
   async getUsers() {
     return this.userService.findAll();
@@ -65,31 +34,74 @@ export class UserController {
 
   @Get('/mail')
   async testMail() {
-    this.mailerService
-      .sendMail({
-        to: 'dangbinhtrieu123@gmail.com',
-        from: 'trieu93710@donga.edu.vn', // list of receivers
-        subject: 'Testing Nest MailerModule ✔', // Subject line
-        text: 'welcome', // plaintext body
-        // html: '<b>welcome</b>', // HTML body content
-        template: 'register',
-        context: {
-          name: 'dangbinhtrieu',
-          activationCode: 123456789,
-        },
-      })
-      .then(() => {})
-      .catch(() => {});
+    this.mailerService.sendMail({
+      to: 'dangbinhtrieu123@gmail.com',
+      from: 'trieu93710@donga.edu.vn',
+      subject: 'Testing Nest MailerModule ✔',
+      text: 'welcome',
+      template: 'register',
+      context: {
+        name: 'dangbinhtrieu',
+        activationCode: 123456789,
+      },
+    });
     return 'OK';
   }
 
   @Get('/:id')
-  @Roles(Role.ADMIN, Role.LESSOR, Role.TENANT)
+  @Roles(Role.ADMIN, Role.MANAGER, Role.TENANT, Role.USER)
   @UseGuards(AuthGuard(), RolesGuard)
   async getUserById(
     @Param('id')
-    id: string,
+    id: number,
   ) {
     return this.userService.findById(id);
+  }
+
+  @Get('admin/:email')
+  // @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async getAdminByEmail(
+    @Param('email')
+    email: string,
+  ) {
+    return this.userService.findAdminByEmail(email);
+  }
+
+  @Get('manager/:email')
+  // @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async getManagerByEmail(
+    @Param('email')
+    email: string,
+  ) {
+    return this.userService.findManagerByEmail(email);
+  }
+
+  @Patch('admin/decentralize/:id')
+  @UseGuards(AuthGuard(), RolesGuard)
+  async decentralization(
+    @Param('id')
+    id: number,
+    @Body()
+    decentralizeDto: DecentralizeDto,
+  ) {
+    return this.userService.decentralization(id, decentralizeDto);
+  }
+
+  @Patch('update-user')
+  @UseGuards(AuthGuard(), RolesGuard)
+  async updateUser(
+    @Body()
+    updateUserDto: UpdateUserDto,
+    @Req()
+    req: any,
+  ) {
+    return this.userService.updateUser(updateUserDto, req.user);
+  }
+
+  @Delete()
+  async remove(@Body() id: number) {
+    return this.userService.remove(id);
   }
 }

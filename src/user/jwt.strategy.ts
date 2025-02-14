@@ -1,17 +1,21 @@
 /* eslint-disable prettier/prettier */
 
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import { User } from './schemas/user.schema';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectModel(User.name)
-    private userSchema: mongoose.Model<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,15 +26,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     const { id } = payload;
 
-    const user = await this.userSchema.findById(id);
+    const user = await this.userRepository.findOneBy({ id: id });
     console.log('user: ', user);
 
     if (!user) {
       throw new UnauthorizedException('Login first to access this endpoint.');
     }
 
-    if (user.isActive === false) {
-      throw new BadRequestException('Account must be activation')
+    if (user.active === false) {
+      throw new BadRequestException('Account must be activation');
     }
 
     return user;

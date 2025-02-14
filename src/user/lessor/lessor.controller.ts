@@ -11,7 +11,7 @@ export class LessorController {
   constructor(private lessorService: LessorService) {}
 
   @Get()
-  @Roles(Role.ADMIN, Role.TENANT)
+  @Roles(Role.ADMIN, Role.TENANT, Role.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard)
   async getAll() {
     return this.lessorService.findAll();

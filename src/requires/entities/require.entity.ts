@@ -1,0 +1,52 @@
+/* eslint-disable prettier/prettier */
+import { PostEntity } from 'src/posts/entities/post.entity';
+import { GenderType } from 'src/shared/enums/gender.enum';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Timestamp,
+  UpdateDateColumn,
+} from 'typeorm';
+
+@Entity('requires')
+export class RequireEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({
+    type: 'enum',
+    enum: GenderType,
+    array: true,
+    default: [GenderType.NULL],
+  })
+  sex: GenderType[];
+
+  @Column({ nullable: true })
+  age: number;
+
+  @Column({ nullable: true })
+  experience: string;
+
+  @Column({ default: 1 })
+  quantity: number;
+
+  @Column()
+  description: string;
+
+  @OneToOne(() => PostEntity, (post) => post.require, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  post: PostEntity | null;
+
+  @CreateDateColumn()
+  createAt: Timestamp;
+
+  @UpdateDateColumn()
+  updateAt: Timestamp;
+}
