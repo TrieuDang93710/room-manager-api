@@ -12,21 +12,21 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CategoryEntity } from 'src/category/entities/category.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
 import { RatingEntity } from 'src/rating/entities/rating.entity';
 import { RequireEntity } from 'src/requires/entities/require.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { PostStatusType } from 'src/shared/enums/post.enum';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
 import { WorkType } from 'src/shared/enums/work.enum';
+import { CompanyEntity } from 'src/company/entities/company.entity';
+import { ApplyEntity } from 'src/apply/entities/apply.entity';
 
 @Entity('posts')
 export class PostEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Column({ nullable: true })
@@ -49,12 +49,12 @@ export class PostEntity {
   })
   work_type: WorkType[];
 
-  @ManyToOne(() => WorkPlaceEntity, (work_place) => work_place.posts, {
+  @ManyToOne(() => CompanyEntity, (comp) => comp.posts, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  work_place: WorkPlaceEntity | null;
+  company: CompanyEntity | null;
 
   @ManyToOne(() => CategoryEntity, (typeOfPost) => typeOfPost.posts, {
     nullable: true,

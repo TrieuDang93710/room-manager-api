@@ -9,5 +9,5 @@ export class RatingPostDto {
   comment: string;
 
   @IsNumber()
-  roomId: number;
+  postId: number;
 }

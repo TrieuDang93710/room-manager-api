@@ -1,19 +1,14 @@
 /* eslint-disable prettier/prettier */
 
-import { IsNotEmpty, IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
-export class CreateContractDto {
-  @IsNotEmpty()
+export class CreateApplyDto {
   @IsString()
-  apply: string;
+  readonly description: string;
 
-  @IsOptional()
-  @IsNotEmpty()
   @IsNumber()
-  applicant: number;
+  readonly post: number;
 
-  @IsOptional()
-  @IsNotEmpty()
   @IsNumber()
-  post: number;
+  readonly resume: number;
 }

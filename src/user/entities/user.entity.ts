@@ -61,7 +61,7 @@ export class UserEntity {
   @Column({ nullable: true })
   code_expired: string;
 
-  @Column({ type: 'enum', enum: Role, array: true, default: [Role.USER] })
+  @Column({ type: 'enum', enum: Role, array: true, default: [Role.APPLICANT] })
   role: Role[];
 
   @OneToOne(() => AddressEntity, (address) => address.user, {

@@ -14,9 +14,10 @@ import { ApplicantEntity } from './entities/applicant.entity';
 import { ManagerEntity } from './entities/manager.entity';
 import { AddressEntity } from 'src/address/entities/address.entity';
 import { PostEntity } from 'src/posts/entities/post.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
 import { RequireEntity } from 'src/requires/entities/require.entity';
 import { PaymentEntity } from 'src/payment/entities/payment.entity';
+import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { ResumeEntity } from 'src/resume/entities/resume.entity';
 
 @Module({
   imports: [
@@ -41,8 +42,9 @@ import { PaymentEntity } from 'src/payment/entities/payment.entity';
       ManagerEntity,
       PostEntity,
       ApplyEntity,
+      ResumeEntity,
       PaymentEntity,
-      RequireEntity
+      RequireEntity,
     ]),
   ],
   controllers: [UserController],

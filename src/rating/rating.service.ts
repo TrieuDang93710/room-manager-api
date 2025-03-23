@@ -20,6 +20,8 @@ export class RatingService {
         userId: true,
       },
       select: {
+        star: true,
+        comment: true,
         post: {
           id: true,
           title: true,

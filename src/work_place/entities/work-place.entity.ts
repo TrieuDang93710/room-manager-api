@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { AddressEntity } from 'src/address/entities/address.entity';
+import { CompanyEntity } from 'src/company/entities/company.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
@@ -17,29 +18,24 @@ export class WorkPlaceEntity {
   id: number;
 
   @Column({ nullable: true })
-  title: string;
-
-  @Column({ nullable: true })
   coordinate: string;
 
   @Column({ nullable: true })
   latitude: string;
 
-  @Column({ nullable: true })
-  address: string;
+  @OneToOne(() => AddressEntity, (address) => address.work_place, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'address_id' })
+  address: AddressEntity | null;
 
-  @Column({ type: 'text', array: true, default: [] })
-  images: string[];
-
-  @Column({ nullable: true })
-  video: string;
-
-  @OneToMany(() => PostEntity, (post) => post.work_place, {
+  @OneToOne(() => CompanyEntity, (comp) => comp.work_place, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  posts: PostEntity[] | null;
+  company: CompanyEntity | null;
 
   @CreateDateColumn()
   createAt: Timestamp;

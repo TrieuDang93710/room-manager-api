@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -17,10 +18,12 @@ import { RolesGuard } from '../user/guards/role.guard';
 import { Roles } from '../user/decorators/role.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { Query as ExpressQuery } from 'express-serve-static-core';
-import { UpdateRoomDto } from './dto/update.dto';
+import { UpdatePostDto } from './dto/update.dto';
 import { RatingPostDto } from './dto/rating.dto';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { PostService } from './post.service';
+import { DelPostDto } from './dto/del.dto';
+import { ApprovePostDto } from './dto/approve.dto';
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
@@ -34,20 +37,43 @@ export class PostController {
     @Req()
     req: any,
   ) {
-    createPostDto.createBy = req.user._id;
     return this.postService.create(createPostDto, req.user);
   }
 
-  @Put('/:id')
-  @Roles(Role.LESSOR, Role.ADMIN, Role.USER)
+  @Patch('/:id')
+  @Roles(Role.LESSOR, Role.ADMIN, Role.USER, Role.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard)
-  async updateRoomById(
+  async updatePostById(
     @Param('id')
     id: number,
     @Body()
-    updateRoomDto: UpdateRoomDto,
+    updatePostDto: UpdatePostDto,
   ) {
-    return this.postService.updateById(id, updateRoomDto);
+    return this.postService.updateById(id, updatePostDto);
+  }
+
+  @Patch('/delete/:id')
+  @Roles(Role.LESSOR, Role.ADMIN, Role.USER, Role.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async deletePostById(
+    @Param('id')
+    id: number,
+    @Body()
+    delPostDto: DelPostDto,
+  ) {
+    return this.postService.removeById(id, delPostDto);
+  }
+
+  @Patch('/approve/:id')
+  @Roles(Role.LESSOR, Role.ADMIN, Role.USER, Role.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async approvedPostById(
+    @Param('id')
+    id: number,
+    @Body()
+    approvePostDto: ApprovePostDto,
+  ) {
+    return this.postService.approvedById(id, approvePostDto);
   }
 
   @Delete('/:id')

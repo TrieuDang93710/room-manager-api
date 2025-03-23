@@ -33,6 +33,7 @@ export class CategoryService {
       },
       select: {
         posts: {
+          id: true,
           title: true,
           description: true,
           status: true,

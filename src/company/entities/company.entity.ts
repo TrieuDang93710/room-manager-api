@@ -1,47 +1,56 @@
 /* eslint-disable prettier/prettier */
-import { UserEntity } from 'src/user/entities/user.entity';
+
+import { PostEntity } from 'src/posts/entities/post.entity';
 import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('address')
-export class AddressEntity {
+@Entity('companies')
+export class CompanyEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: true })
-  national: string;
+  title: string;
 
   @Column({ nullable: true })
-  city: string;
+  description: string;
+
+  @Column({ type: 'text', array: true, default: [] })
+  images: string[];
 
   @Column({ nullable: true })
-  district: string;
+  video: string;
 
-  @Column({ nullable: true })
-  village: string;
-
-  @OneToOne(() => UserEntity, (user) => user.address, {
+  @Column({
+    default: {},
+    type: 'jsonb',
     nullable: true,
-    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity | null;
+  contact: object;
 
-  @OneToOne(() => WorkPlaceEntity, (w_place) => w_place.address, {
+  @OneToOne(() => WorkPlaceEntity, (w_place) => w_place.company, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   work_place: WorkPlaceEntity | null;
+
+  @OneToMany(() => PostEntity, (post) => post.company, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  posts: PostEntity[] | null;
 
   @CreateDateColumn()
   createAt: Timestamp;

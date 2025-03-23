@@ -8,13 +8,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { ApplicantEntity } from '../entities/applicant.entity';
 import { ManagerEntity } from '../entities/manager.entity';
+import { ResumeEntity } from 'src/resume/entities/resume.entity';
 
 @Module({
   imports: [
     UserModule,
-    MongooseModule.forFeature([
+    MongooseModule.forFeature([]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      ApplicantEntity,
+      ManagerEntity,
+      ResumeEntity,
     ]),
-    TypeOrmModule.forFeature([UserEntity, ApplicantEntity, ManagerEntity]),
   ],
   providers: [ApplicantService],
   controllers: [ApplicantController],
