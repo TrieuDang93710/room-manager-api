@@ -78,9 +78,9 @@ export class AuthService {
     };
 
     if (!role) {
-      const newTenant = this.applicantRepository.create(null);
-      await this.applicantRepository.save(newTenant);
-      newUserData.tenant = newTenant;
+      const newApplicant = this.applicantRepository.create(null);
+      await this.applicantRepository.save(newApplicant);
+      newUserData.applicant = newApplicant;
     } else {
       if (role[0] === 'admin') {
         newUserData.role = role;
@@ -97,8 +97,8 @@ export class AuthService {
     console.log('user: ', user);
 
     // Update user into tenant
-    if (user.role && user.role[0] === 'user' && user.tenant) {
-      await this.updateTenantUserId(user.tenant.id, user.id);
+    if (user.role && user.role[0] === 'applicant' && user.applicant) {
+      await this.updateApplicantUserId(user.applicant.id, user.id);
     }
 
     // Update user into manager
@@ -244,21 +244,21 @@ export class AuthService {
     };
   }
 
-  private async updateTenantUserId(
-    tenantId: number,
+  private async updateApplicantUserId(
+    applicantId: number,
     userId: number,
   ): Promise<void> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    const tenant: ApplicantEntity = await this.applicantRepository.findOne({
+    const applicant: ApplicantEntity = await this.applicantRepository.findOne({
       where: {
-        id: tenantId,
+        id: applicantId,
       },
     });
-    if (tenant && !tenant.user) {
-      tenant.user = user;
-      await this.applicantRepository.save(tenant);
+    if (applicant && !applicant.user) {
+      applicant.user = user;
+      await this.applicantRepository.save(applicant);
     } else {
-      throw new Error('User id is already existed for this tenants.');
+      throw new Error('User id is already existed for this applicants.');
     }
   }
 

@@ -12,6 +12,9 @@ import { RatingEntity } from 'src/rating/entities/rating.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
+import { CompanyEntity } from 'src/company/entities/company.entity';
+import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { ResumeEntity } from 'src/resume/entities/resume.entity';
 
 @Module({
   imports: [
@@ -24,7 +27,10 @@ import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
       CategoryEntity,
       RequireEntity,
       RatingEntity,
-      WorkPlaceEntity
+      WorkPlaceEntity,
+      CompanyEntity,
+      ApplyEntity,
+      ResumeEntity
     ]),
   ],
   controllers: [PostController],

@@ -11,8 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
 import { SalaryEntity } from 'src/salary/entities/salary.entity';
+import { ResumeEntity } from 'src/resume/entities/resume.entity';
 
 @Entity('applicants')
 export class ApplicantEntity {
@@ -40,12 +40,12 @@ export class ApplicantEntity {
   @JoinColumn()
   wishlists: PostEntity[] | null;
 
-  @OneToMany(() => ApplyEntity, (apply) => apply.applicant, {
+  @OneToMany(() => ResumeEntity, (resume) => resume.applicant, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  applies: ApplyEntity[] | null;
+  resumes: ResumeEntity[] | null;
 
   @OneToOne(() => UserEntity, (user) => user.applicant, {
     nullable: true,

@@ -2,31 +2,21 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
-  @IsOptional()
   @IsString()
-  readonly name: string;
+  readonly title: string;
 
-  @IsOptional()
   @IsString()
   readonly description: string;
 
-  @IsOptional()
-  @IsString()
-  readonly address: string;
-
-  @IsOptional()
-  @IsString()
-  readonly price: string;
-
-  @IsOptional()
-  @IsString()
-  readonly numOfRoom: string;
-
-  @IsOptional()
   @IsNumber()
-  readonly typeOfRoom: number;
+  readonly company: number;
+
+  @IsNumber()
+  readonly type_of_post: number;
 
   @IsOptional()
-  @IsString()
-  createBy: number;
+  readonly duration: Date;
+
+  @IsOptional()
+  readonly require: number;
 }

@@ -29,8 +29,15 @@ export class UserService {
     const data = await this.userRepository.find({
       relations: {
         address: true,
-        applicant: true,
-        manager: true,
+        applicant: {
+          resumes: true,
+          saves: true,
+          wishlists: true
+        },
+        manager: {
+          packages: true,
+          posts: true
+        },
       },
       select: {
         address: {

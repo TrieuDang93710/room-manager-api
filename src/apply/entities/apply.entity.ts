@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import {
   Column,
   CreateDateColumn,
@@ -12,35 +10,34 @@ import {
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
+import { PostEntity } from 'src/posts/entities/post.entity';
 import { ApplyStatusType } from 'src/shared/enums/apply.enum';
+import { ResumeEntity } from 'src/resume/entities/resume.entity';
 
 @Entity('applies')
 export class ApplyEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  title: string;
-
-  @Column()
-  apply: string;
+  @Column({nullable: true})
+  description: string;
 
   @Column({
     type: 'enum',
     enum: ApplyStatusType,
     array: true,
-    default: [ApplyStatusType.NOT_APPROVED],
+    default: [ApplyStatusType.APPLIED],
   })
   status: ApplyStatusType[];
 
-  @ManyToOne(() => ApplicantEntity, (applicant) => applicant.applies, {
+  @OneToOne(() => ResumeEntity, (resume) => resume.apply, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  applicant: ApplicantEntity | null;
+  resume: ResumeEntity | null;
 
-  @OneToOne(() => PostEntity, (post) => post.applies, {
+  @ManyToOne(() => PostEntity, (post) => post.applies, {
     nullable: true,
     onDelete: 'CASCADE',
   })

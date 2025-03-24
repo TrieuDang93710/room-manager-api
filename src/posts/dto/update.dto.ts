@@ -1,62 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { IsOptional } from "class-validator"
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
+export class UpdatePostDto {
+  @IsNotEmpty()
+  @IsString()
+  readonly title: string;
 
-export class UpdateRoomDto {
+  @IsOptional()
+  readonly description: string;
 
-    @IsOptional()
-    readonly name: string
+  @IsOptional()
+  readonly work_type: string[];
 
-    @IsOptional()
-    readonly description: string
-
-    @IsOptional()
-    readonly address: string
-
-    @IsOptional()
-    readonly price: string
-
-    @IsOptional()
-    readonly status: false
-
-    @IsOptional()
-    readonly numOfRoom: string
-
-    @IsOptional()
-    readonly images: []
-
-    @IsOptional()
-    readonly video: string
-
-    @IsOptional()
-    readonly rentPerRoom: []
-
-    @IsOptional()
-    readonly typeOfRoom: string
-
-    @IsOptional()
-    readonly hidden: false
-
-    @IsOptional()
-    readonly approved: false
-
-    @IsOptional()
-    readonly removed: false
-
-    @IsOptional()
-    readonly ratings: [{
-        star: 0,
-        comment: '',
-        postId: string
-    }]
-
-    @IsOptional()
-    readonly totalRating: number
-
-    @IsOptional()
-    readonly requires: []
-
-    @IsOptional()
-    createBy: string
-
+  @IsOptional()
+  readonly duration: Date;
 }

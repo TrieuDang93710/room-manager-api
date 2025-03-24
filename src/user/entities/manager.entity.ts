@@ -22,7 +22,7 @@ export class ManagerEntity {
 
   @Column({
     default: [],
-    type: 'simple-json',
+    type: 'jsonb',
     array: true,
     nullable: true,
   })
