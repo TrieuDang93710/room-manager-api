@@ -17,6 +17,7 @@ import {
 import { ManagerEntity } from './manager.entity';
 import { MessageEntity } from 'src/message/entities/message.entity';
 import { ApplicantEntity } from './applicant.entity';
+import { GenderType } from 'src/shared/enums/gender.enum';
 
 @Entity('users')
 export class UserEntity {
@@ -63,6 +64,9 @@ export class UserEntity {
 
   @Column({ type: 'enum', enum: Role, array: true, default: [Role.APPLICANT] })
   role: Role[];
+
+  @Column({ type: 'enum', enum: Role, array: true, default: [GenderType.NULL] })
+  gender: GenderType[];
 
   @OneToOne(() => AddressEntity, (address) => address.user, {
     nullable: true,

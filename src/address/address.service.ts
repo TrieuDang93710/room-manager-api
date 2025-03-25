@@ -20,7 +20,7 @@ export class AddressService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all address successfully',
+      message: 'Get all address successfully',
       data: data,
     };
   }

@@ -49,7 +49,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.TENANT, Role.USER)
+  @Roles(Role.ADMIN, Role.MANAGER, Role.TENANT, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async getUserById(
     @Param('id')
@@ -66,6 +66,16 @@ export class UserController {
     email: string,
   ) {
     return this.userService.findAdminByEmail(email);
+  }
+
+  @Get('/:email')
+  // @Roles(Role.ADMIN, Role.USER)
+  // @UseGuards(AuthGuard(), RolesGuard)
+  async getUserByEmail(
+    @Param('email')
+    email: string,
+  ) {
+    return this.userService.findUserByEmail(email);
   }
 
   @Get('manager/:email')

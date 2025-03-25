@@ -18,5 +18,11 @@ export class CreatePostDto {
   readonly duration: Date;
 
   @IsOptional()
+  readonly salary: string;
+
+  @IsOptional()
+  readonly benefit: string;
+
+  @IsOptional()
   readonly require: number;
 }

@@ -32,12 +32,18 @@ export class UserService {
         applicant: {
           resumes: true,
           saves: true,
-          wishlists: true
+          wishlists: true,
+          applies: {
+            post: true,
+            resume: true
+          },
         },
         manager: {
           packages: true,
-          posts: true
+          posts: true,
         },
+        senderMessages: true,
+        receiverMessages: true,
       },
       select: {
         address: {
@@ -58,7 +64,7 @@ export class UserService {
     );
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all user successfully',
+      message: 'Get all user successfully',
       data: roleNotAdminFiltered,
     };
   }
@@ -76,7 +82,7 @@ export class UserService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get user successfully',
+      message: 'Get user successfully',
       data: data,
     };
   }
@@ -87,9 +93,12 @@ export class UserService {
         email: email,
       },
     });
+    if (!data) {
+      throw new NotFoundException('Not found user by this email');
+    }
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get a user by email successfully',
+      message: 'Get a user by email successfully',
       data: data,
     };
   }
@@ -102,7 +111,7 @@ export class UserService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all tenant successfully',
+      message: 'Get all tenant successfully',
       data: data,
     };
   }
@@ -123,14 +132,14 @@ export class UserService {
       isAdmin = false;
       return {
         statusCode: HttpStatus.OK,
-        statusMessage: 'User must not be administration',
+        message: 'User must not be administration',
         data: { isAdmin },
       };
     }
     isAdmin = true;
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get admin successful',
+      message: 'Get admin successful',
       data: { isAdmin },
     };
   }
@@ -151,7 +160,7 @@ export class UserService {
       isManager = false;
       return {
         statusCode: HttpStatus.OK,
-        statusMessage: 'User must not be management',
+        message: 'User must not be management',
         data: {
           isManager,
         },
@@ -160,7 +169,7 @@ export class UserService {
     isManager = true;
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get manager successful',
+      message: 'Get manager successful',
       data: {
         isManager,
       },
@@ -208,7 +217,7 @@ export class UserService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Decentralization successful',
+      message: 'Decentralization successful',
       data: user,
     };
   }
@@ -230,7 +239,7 @@ export class UserService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update user successful',
+      message: 'Update user successful',
       data: findUser,
     };
   }
@@ -239,7 +248,7 @@ export class UserService {
     const result = await this.userRepository.delete(id);
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Delete user successful',
+      message: 'Delete user successful',
       data: result,
     };
   }

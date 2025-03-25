@@ -1,14 +1,17 @@
 /* eslint-disable prettier/prettier */
 
-import { IsNumber, IsString } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class CreateApplyDto {
-  @IsString()
+  @IsOptional()
   readonly description: string;
 
-  @IsNumber()
+  @IsOptional()
+  readonly letter: object;
+
+  @IsOptional()
   readonly post: number;
 
-  @IsNumber()
+  @IsOptional()
   readonly resume: number;
 }

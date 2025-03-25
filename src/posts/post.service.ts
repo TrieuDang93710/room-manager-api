@@ -68,11 +68,10 @@ export class PostService {
         },
         applies: {
           post: true,
-          resume: {
-            applicant: {
-              user: true
-            }
-          }
+          resume: true,
+          applicant: {
+            user: true,
+          },
         },
         createBy: {
           packages: true,
@@ -86,15 +85,22 @@ export class PostService {
           description: true,
         },
         require: {
-          sex: true,
+          gender: true,
           age: true,
           description: true,
           quantity: true,
           experience: true,
+          level: true,
+          education: true,
+          skill: true,
         },
         company: {
           title: true,
+          scale: true,
           contact: {},
+          images: true,
+          video: true,
+          logo: true,
           work_place: {
             coordinate: true,
             latitude: true,
@@ -130,6 +136,21 @@ export class PostService {
             role: true,
           },
         },
+        applies: {
+          id: true,
+          description: true,
+          letter: {},
+          createAt: {},
+          status: true,
+          applicant: {
+            id: true,
+            user: {
+              username: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
       },
       take: resPerPage,
       skip: skip,
@@ -139,7 +160,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all post successfully',
+      message: 'Get all post successfully',
       data: {
         result: result,
         totalItems: total,
@@ -169,6 +190,13 @@ export class PostService {
           packages: true,
           user: true,
         },
+        applies: {
+          post: true,
+          resume: true,
+          applicant: {
+            user: true,
+          },
+        },
       },
       select: {
         type_of_post: {
@@ -177,15 +205,20 @@ export class PostService {
           description: true,
         },
         require: {
-          sex: true,
+          gender: true,
           age: true,
           description: true,
           quantity: true,
           experience: true,
+          level: true,
+          education: true,
+          skill: true,
         },
         company: {
           title: true,
+          scale: true,
           contact: {},
+          logo: true,
           work_place: {
             coordinate: true,
             latitude: true,
@@ -221,6 +254,21 @@ export class PostService {
             role: true,
           },
         },
+        applies: {
+          id: true,
+          status: true,
+          description: true,
+          letter: {},
+          createAt: {},
+          applicant: {
+            id: true,
+            user: {
+              username: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
       },
     });
     if (!room) {
@@ -228,7 +276,7 @@ export class PostService {
     }
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get a room successfully',
+      message: 'Get a room successfully',
       data: room,
     };
   }
@@ -278,11 +326,15 @@ export class PostService {
     }
 
     const newRequire = this.requireRepository.create({
-      sex: createPostDto.require.sex,
+      gender: createPostDto.require.gender,
       age: createPostDto.require.age,
+      level: createPostDto.require.level,
+      education: createPostDto.require.education,
+      skill: createPostDto.require.experience,
       experience: createPostDto.require.experience,
+      time: createPostDto.require.time,
       quantity: createPostDto.require.quantity,
-      description: createPostDto.require.description,
+      description: createPostDto.require.detail,
     });
     await this.requireRepository.save(newRequire);
 
@@ -300,6 +352,8 @@ export class PostService {
       description: createPostDto.description,
       company: findCompanyAlready,
       type_of_post: findCategoryAlready,
+      salary: createPostDto.salary,
+      benefit: createPostDto.benefit,
       require: newRequire,
       duration: createPostDto.duration,
       createBy: findCreateByUser,
@@ -345,7 +399,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Create new post successfully',
+      message: 'Create new post successfully',
       data: newPost,
     };
   }
@@ -371,7 +425,7 @@ export class PostService {
     const data: any = await this.postRepository.update(id, post!);
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update successfully',
+      message: 'Update successfully',
       data: data,
     };
   }
@@ -412,7 +466,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Remove post into database successfully',
+      message: 'Remove post into database successfully',
       data: data,
     };
   }
@@ -459,7 +513,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Approved post into database successfully',
+      message: 'Approved post into database successfully',
       data: data,
     };
   }
@@ -492,7 +546,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Delete successfully',
+      message: 'Delete successfully',
       data: result,
     };
   }
@@ -550,7 +604,7 @@ export class PostService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Rating successfully',
+      message: 'Rating successfully',
       data: findPost,
     };
   }

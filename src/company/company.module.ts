@@ -7,10 +7,17 @@ import { CompanyEntity } from './entities/company.entity';
 import { CompanyService } from './company.service';
 import { CompanyController } from './compnay.controller';
 import { AddressEntity } from 'src/address/entities/address.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyEntity, PostEntity, WorkPlaceEntity, AddressEntity]),
+    UserModule,
+    TypeOrmModule.forFeature([
+      CompanyEntity,
+      PostEntity,
+      WorkPlaceEntity,
+      AddressEntity,
+    ]),
   ],
   providers: [CompanyService],
   controllers: [CompanyController],

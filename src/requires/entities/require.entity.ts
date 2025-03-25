@@ -23,7 +23,7 @@ export class RequireEntity {
     array: true,
     default: [GenderType.NULL],
   })
-  sex: GenderType[];
+  gender: GenderType[];
 
   @Column({ nullable: true })
   age: number;
@@ -34,8 +34,20 @@ export class RequireEntity {
   @Column({ default: 1 })
   quantity: number;
 
+  @Column({ nullable: true})
+  level: string;
+
+  @Column({ nullable: true})
+  education: string;
+
   @Column()
   description: string;
+
+  @Column({ nullable: true })
+  skill: string;
+
+  @Column({ nullable: true })
+  time: string;
 
   @OneToOne(() => PostEntity, (post) => post.require, {
     nullable: true,

@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyEntity } from './entities/company.entity';
@@ -53,7 +58,7 @@ export class CompanyService {
             title: true,
           },
           require: {
-            sex: true,
+            gender: true,
             age: true,
             description: true,
             quantity: true,
@@ -79,7 +84,7 @@ export class CompanyService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all company successfully',
+      message: 'Get all company successfully',
       data: {
         result: result,
         totalItems: total,
@@ -90,7 +95,7 @@ export class CompanyService {
   }
 
   async create(createCompanyDto: any): Promise<ApiResponseDto<any>> {
-    const { title, contact, work_place } = createCompanyDto;
+    const { title, logo, contact, work_place } = createCompanyDto;
     if (!work_place) {
       throw new BadRequestException('work_place has not to be blank');
     }
@@ -120,6 +125,7 @@ export class CompanyService {
 
     const newCompany = this.companyRepository.create({
       title: title,
+      logo: logo,
       contact: contact,
       work_place: newWorkPlace,
     });
@@ -130,8 +136,52 @@ export class CompanyService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Create new company successfully',
+      message: 'Create new company successfully',
       data: newCompany,
+    };
+  }
+
+  async approve(approveDto: any, id: any): Promise<ApiResponseDto<any>> {
+    if (!approveDto) {
+      throw new BadRequestException('Bad request');
+    }
+    console.log('approveDto: ==>', { approveDto, id });
+    const findCompany: any = this.companyRepository.findOne({
+      where: { id: Number(id) },
+    });
+
+    if (!findCompany) {
+      throw new NotFoundException('Not found company');
+    }
+
+    const result = await this.companyRepository.update(Number(id), approveDto);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Approved the company successful',
+      data: result,
+    };
+  }
+
+  async remove(removeDto: any, id: number): Promise<ApiResponseDto<any>> {
+    if (!removeDto) {
+      throw new BadRequestException('Bad request');
+    }
+    const findCompany: any = this.companyRepository.findOne({
+      where: { id: Number(id) },
+    });
+    if (!findCompany) {
+      throw new NotFoundException('Not found company');
+    }
+
+    // findCompany.status = removeDto.status;
+    // await this.companyRepository.save(findCompany);
+    const result = await this.companyRepository.update(Number(id), removeDto);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Removed the company successful',
+      data: result,
     };
   }
 }

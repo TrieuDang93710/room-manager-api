@@ -5,8 +5,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   UseGuards,
@@ -43,8 +43,8 @@ export class ResumeController {
     return this.resumeService.findAll(query);
   }
 
-  @Get('/:id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.USER)
+  @Get('/get-one/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async getResume(
     @Param('id')
@@ -53,8 +53,8 @@ export class ResumeController {
     return this.resumeService.findById(id);
   }
 
-  @Put('/:id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.USER)
+  @Patch('/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async updateResume(
     @Param('id')
@@ -65,8 +65,20 @@ export class ResumeController {
     return this.resumeService.updateById(id, updateContractDto);
   }
 
+  @Patch('/remove/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async removeResume(
+    @Param('id')
+    id: number,
+    @Body()
+    statusDto: any,
+  ) {
+    return this.resumeService.removeById(id, statusDto);
+  }
+
   @Delete('/:id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.USER)
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async deleteResume(
     @Param('id')

@@ -6,6 +6,9 @@ export class CreateCompanyDto {
   @IsString()
   readonly title: string;
 
+  @IsString()
+  readonly logo: string;
+
   @IsArray()
   readonly contact: [];
 

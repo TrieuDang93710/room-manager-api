@@ -36,7 +36,7 @@ export class RequireService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Create successful',
+      message: 'Create successful',
       data: res,
     };
   }
@@ -54,7 +54,7 @@ export class RequireService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all successful',
+      message: 'Get all successful',
       data: result,
     };
   }

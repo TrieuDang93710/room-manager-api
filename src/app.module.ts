@@ -21,7 +21,6 @@ import { AuthModule } from './auth/auth.module';
 import { dataSourceOptions } from 'db/data-source';
 import { RatingModule } from './rating/rating.module';
 import { MessageModule } from './message/message.module';
-import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { SalaryModule } from './salary/salary.module';
 import { PaymentModule } from './payment/payment.module';
@@ -86,6 +85,6 @@ import { ServicePackageModule } from './service_package/service_package.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, CloudinaryService],
+  providers: [AppService],
 })
 export class AppModule {}

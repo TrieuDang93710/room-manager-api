@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -15,12 +17,15 @@ import { Role } from 'src/shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/user/guards/role.guard';
 import { CreateApplyDto } from './dto/create.dto';
+import { StatusDto } from './dto/status.gto';
 
 @Controller('apply')
 export class ApplyController {
   constructor(private readonly applyService: ApplyService) {}
 
   @Get()
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
   async getAllApplies(
     @Query()
     query: ExpressQuery,
@@ -38,5 +43,39 @@ export class ApplyController {
     req: any,
   ) {
     return this.applyService.create(createApplyDto, req.user);
+  }
+
+  @Get('/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async getApplyById(
+    @Param('id')
+    id: number,
+  ) {
+    return this.applyService.findById(id);
+  }
+
+  @Patch('/remove/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async removeApplyById(
+    @Param('id')
+    id: number,
+    @Body()
+    statusDto: StatusDto,
+  ) {
+    return this.applyService.removeById(id, statusDto);
+  }
+
+  @Patch('/update/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async updateApplyById(
+    @Param('id')
+    id: number,
+    @Body()
+    statusDto: StatusDto,
+  ) {
+    return this.applyService.updateById(id, statusDto);
   }
 }

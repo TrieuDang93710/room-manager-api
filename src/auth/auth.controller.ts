@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
   Body,
   Controller,
   Param,
@@ -26,11 +25,12 @@ export class AuthController {
   }
 
   @Post('/activate-account/:userId')
-  @Roles(Role.ADMIN, Role.LESSOR, Role.TENANT)
+  @Roles(Role.ADMIN, Role.LESSOR, Role.TENANT, Role.APPLICANT)
   async activateAccount(
-    @Param('userId') userId: number
+    @Param('userId') userId: number,
+    @Body() codeId: string,
   ) {
-    return this.authService.activateAccount(userId);
+    return this.authService.activateAccount(userId, codeId);
   }
 
   @Post('/sign-in')
@@ -42,10 +42,10 @@ export class AuthController {
   }
 
   @Post('/refresh-token')
-  async refreshToken(@Body() { refreshToken }: { refreshToken: string }) {
-    if (!refreshToken) {
-      throw new BadRequestException('Refresh token is required.');
-    }
+  async refreshToken(@Body() refreshToken: string) {
+    // if (!refreshToken) {
+    //   throw new BadRequestException('Refresh token is required.');
+    // }
     return this.authService.verifyRefreshToken(refreshToken);
   }
 

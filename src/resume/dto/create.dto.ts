@@ -6,6 +6,12 @@ export class CreateResumeDto {
   readonly title: string;
 
   @IsString()
+  readonly job: string;
+
+  @IsString()
+  readonly target: string;
+
+  @IsString()
   readonly image: string;
 
   @IsString()
@@ -14,8 +20,8 @@ export class CreateResumeDto {
   @IsString()
   readonly cv: string;
 
-  @IsString()
-  readonly education: string;
+  @IsOptional()
+  readonly education: object;
 
   @IsString()
   readonly level: string;

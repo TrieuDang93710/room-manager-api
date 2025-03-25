@@ -5,6 +5,12 @@ export class UpdateResumeDto {
   title: string;
 
   @IsOptional()
+  job: string;
+
+  @IsOptional()
+  target: string;
+
+  @IsOptional()
   image: string;
 
   @IsOptional()

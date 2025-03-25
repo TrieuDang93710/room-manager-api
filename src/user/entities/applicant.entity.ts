@@ -13,6 +13,7 @@ import {
 import { UserEntity } from './user.entity';
 import { SalaryEntity } from 'src/salary/entities/salary.entity';
 import { ResumeEntity } from 'src/resume/entities/resume.entity';
+import { ApplyEntity } from 'src/apply/entities/apply.entity';
 
 @Entity('applicants')
 export class ApplicantEntity {
@@ -46,6 +47,13 @@ export class ApplicantEntity {
   })
   @JoinColumn()
   resumes: ResumeEntity[] | null;
+
+  @OneToMany(() => ApplyEntity, (apply) => apply.applicant, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  applies: ApplyEntity[] | null;
 
   @OneToOne(() => UserEntity, (user) => user.applicant, {
     nullable: true,
