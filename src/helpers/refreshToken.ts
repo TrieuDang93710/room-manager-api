@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -25,14 +24,15 @@ export class RefreshTokenService {
     );
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    const salt = 10;
+    // const salt = 10;
 
     if (!user) {
       throw new NotAcceptableException('User not found');
     }
 
     await this.userRepository.update(userId, {
-      refresh_token: await bcrypt.hash(refreshToken, salt),
+      refresh_token: refreshToken,
+      // refresh_token: await bcrypt.hash(refreshToken, salt),
     });
 
     return { refreshToken };

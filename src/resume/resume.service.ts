@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { ResumeEntity } from './entities/resume.entity';
@@ -44,9 +49,11 @@ export class ResumeService {
 
     const body = {
       title: createResumeDto.title,
+      job: createResumeDto.job,
+      target: createResumeDto.target,
       image: createResumeDto.image,
       description: createResumeDto.description,
-      cv: createResumeDto.apply,
+      cv: createResumeDto.cv,
       education: createResumeDto.education,
       level: createResumeDto.level,
       experiences: createResumeDto.experiences,
@@ -90,7 +97,7 @@ export class ResumeService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Create new resume successfully',
+      message: 'Create new resume successfully',
       data: newResume,
     };
   }
@@ -110,8 +117,11 @@ export class ResumeService {
       where: keyword,
       relations: {
         applicant: {
-          user: true,
+          user: {
+            address: true,
+          },
         },
+        applies: true
       },
       select: {
         applicant: {
@@ -120,6 +130,11 @@ export class ResumeService {
             username: true,
             email: true,
             role: true,
+            address: {
+              village: true,
+              district: true,
+              city: true,
+            },
           },
         },
       },
@@ -131,7 +146,7 @@ export class ResumeService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all resume successfully',
+      message: 'Get all resume successfully',
       data: {
         result: result,
         totalItems: total,
@@ -148,7 +163,9 @@ export class ResumeService {
       where: { id: id },
       relations: {
         applicant: {
-          user: true,
+          user: {
+            address: true,
+          },
         },
       },
       select: {
@@ -158,13 +175,20 @@ export class ResumeService {
             username: true,
             email: true,
             role: true,
+            date_of_birth: true,
+            phone: true,
+            address: {
+              village: true,
+              district: true,
+              city: true,
+            },
           },
         },
       },
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get a resume successfully',
+      message: 'Get a resume successfully',
       data: resume,
     };
   }
@@ -173,13 +197,37 @@ export class ResumeService {
     id: number,
     updateContractDto: any,
   ): Promise<ApiResponseDto<ResumeEntity>> {
+    const findResume = await this.resumeRepository.findOne({
+      where: { id: id },
+    });
+    if (!findResume) {
+      throw new NotFoundException('Not found resume into database');
+    }
     const result: any = await this.resumeRepository.update(
       id,
       updateContractDto,
     );
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update resume successfully',
+      message: 'Update resume successfully',
+      data: result,
+    };
+  }
+
+  async removeById(id: number, statusDto: any): Promise<ApiResponseDto<any>> {
+    const findResume = await this.resumeRepository.findOne({
+      where: { id: id },
+    });
+    if (!findResume) {
+      throw new NotFoundException('Not found resume into database');
+    }
+    // findResume.status = statusDto;
+    // await this.resumeRepository.save(findResume);
+    const result: any = await this.resumeRepository.update(id, statusDto);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Remove a resume into database',
       data: result,
     };
   }
@@ -188,7 +236,7 @@ export class ResumeService {
     const result: any = await this.resumeRepository.delete(id);
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all resume successfully',
+      message: 'Get all resume successfully',
       data: result,
     };
   }

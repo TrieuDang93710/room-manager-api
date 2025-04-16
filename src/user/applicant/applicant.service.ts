@@ -23,7 +23,7 @@ export class ApplicantService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all tenant successfully',
+      message: 'Get all tenant successfully',
       data: data,
     };
   }

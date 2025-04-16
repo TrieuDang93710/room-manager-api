@@ -83,6 +83,12 @@ export class PostEntity {
   @Column({ type: 'date', nullable: true })
   duration: Date;
 
+  @Column({ nullable: true })
+  salary: number;
+
+  @Column({ nullable: true })
+  benefit: string;
+
   @OneToOne(() => RequireEntity, (require) => require.post, {
     nullable: true,
     onDelete: 'CASCADE',

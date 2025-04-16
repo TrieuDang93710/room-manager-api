@@ -8,6 +8,7 @@ import { ApplyController } from './apply.controller';
 import { ApplyService } from './apply.service';
 import { ApplyEntity } from './entities/apply.entity';
 import { ResumeEntity } from 'src/resume/entities/resume.entity';
+import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ResumeEntity } from 'src/resume/entities/resume.entity';
       UserEntity,
       PostEntity,
       ResumeEntity,
+      ApplicantEntity,
     ]),
   ],
   controllers: [ApplyController],

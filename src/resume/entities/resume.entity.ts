@@ -5,7 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
@@ -23,6 +23,12 @@ export class ResumeEntity {
   title: string;
 
   @Column({ nullable: true })
+  job: string;
+
+  @Column({ nullable: true })
+  target: string;
+
+  @Column({ nullable: true })
   image: string;
 
   @Column({ nullable: true })
@@ -32,7 +38,14 @@ export class ResumeEntity {
   cv: string;
 
   @Column({ nullable: true })
-  education: string;
+  hobby: string;
+
+  @Column({
+    default: {},
+    type: 'jsonb',
+    nullable: true,
+  })
+  education: object;
 
   @Column({ nullable: true })
   level: string;
@@ -63,6 +76,13 @@ export class ResumeEntity {
     type: 'jsonb',
     nullable: true,
   })
+  expertise: object;
+
+  @Column({
+    default: {},
+    type: 'jsonb',
+    nullable: true,
+  })
   skills: object;
 
   @Column({
@@ -87,12 +107,12 @@ export class ResumeEntity {
   @JoinColumn()
   applicant: ApplicantEntity | null;
 
-  @OneToOne(() => ApplyEntity, (apply) => apply.resume, {
+  @OneToMany(() => ApplyEntity, (apply) => apply.resume, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  apply: ApplyEntity | null;
+  applies: ApplyEntity[] | null;
 
   @CreateDateColumn()
   createAt: Timestamp;

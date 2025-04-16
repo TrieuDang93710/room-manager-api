@@ -31,7 +31,7 @@ export class PaymentService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all payment method successfully',
+      message: 'Get all payment method successfully',
       data: data,
     };
   }
@@ -107,7 +107,7 @@ export class PaymentService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Created successful',
+      message: 'Created successful',
       data: newPayment,
     };
   }
@@ -119,7 +119,7 @@ export class PaymentService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get a payment method successfully',
+      message: 'Get a payment method successfully',
       data: data,
     };
   }
@@ -134,7 +134,7 @@ export class PaymentService {
     );
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update payment method successfully',
+      message: 'Update payment method successfully',
       data: result,
     };
   }
@@ -143,7 +143,7 @@ export class PaymentService {
     const result: any = await this.paymentRepository.delete(id);
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update payment method successfully',
+      message: 'Update payment method successfully',
       data: result,
     };
   }

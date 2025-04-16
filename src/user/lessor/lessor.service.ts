@@ -35,7 +35,7 @@ export class LessorService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all lessor successfully',
+      message: 'Get all lessor successfully',
       data: data,
     };
   }

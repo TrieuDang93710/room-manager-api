@@ -5,12 +5,12 @@ import { IsEmpty, IsOptional } from 'class-validator';
 export class ApiResponseDto<T> {
   @IsEmpty()
   @IsOptional()
-  statusCode: number;
+  statusCode?: number;
 
   @IsEmpty()
   @IsOptional()
-  statusMessage: string;
+  message?: string;
 
   @IsOptional()
-  data: T;
+  data?: T;
 }

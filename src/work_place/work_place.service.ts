@@ -28,7 +28,7 @@ export class WorkPlaceService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all work places',
+      message: 'Get all work places',
       data: data,
     };
   }

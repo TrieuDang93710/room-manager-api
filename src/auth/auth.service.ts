@@ -22,6 +22,7 @@ import { SignInDto } from 'src/user/dto/signin.dto';
 import { AddressEntity } from 'src/address/entities/address.entity';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { TimestampConvert } from 'src/helpers/convert';
 
 @Injectable()
 export class AuthService {
@@ -117,14 +118,18 @@ export class AuthService {
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Sign up successful',
+      message: 'Sign up successful',
       data: { token, user },
     };
   }
 
-  async activateAccount(userId: number): Promise<any> {
+  async activateAccount(userId: number, codeId: string): Promise<any> {
     console.log('===>');
-    const user: any = this.usersRepository.findOne({
+    if (!codeId) {
+      throw new NotFoundException('Bad request');
+    }
+    console.log('object: ', codeId);
+    const user: any = await this.usersRepository.findOne({
       where: { id: userId },
     });
 
@@ -142,12 +147,12 @@ export class AuthService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Account activation successful',
+      message: 'Account activation successful',
       data: updateUser,
     };
   }
 
-  async signIn(signInDto: SignInDto) {
+  async signIn(signInDto: SignInDto): Promise<ApiResponseDto<any>> {
     const { email, password } = signInDto;
 
     const user = await this.usersRepository.findOne({
@@ -163,51 +168,109 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password.');
     }
 
-    const token = this.generateTokenService.token(
-      user.id,
-      user.email,
-      user.role[0],
-    );
+    let data: { token: string; refreshToken: string };
 
-    const refresh = this.refreshTokenService.refreshToken(
-      user.id,
-      user.email,
-      user.role[0],
-    );
+    if (!user.token && !user.refresh_token) {
+      const token = this.generateTokenService.token(
+        user.id,
+        user.email,
+        user.role[0],
+      );
 
-    const data = {
-      token: (await token).token,
-      refreshToken: (await refresh).refreshToken,
-    };
+      const refresh = this.refreshTokenService.refreshToken(
+        user.id,
+        user.email,
+        user.role[0],
+      );
 
-    console.log('data: ', data);
+      data = {
+        token: (await token).token,
+        refreshToken: (await refresh).refreshToken,
+      };
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      statusMessage: 'Login successfully',
-      data: data,
-    };
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Login successfully',
+        data: data,
+      };
+    }
+
+    const decodeToken = this.jwtService.decode(user.token);
+    const decodeRefreshToken = this.jwtService.decode(user.refresh_token);
+    const get_time = new Date().getTime();
+    const datetime = Math.floor(get_time / 1000);
+
+    const token_time_exp = decodeToken.exp - decodeToken.iat;
+    const refresh_token_time_exp =
+      decodeRefreshToken.exp - decodeRefreshToken.iat;
+    const realtime = datetime - decodeToken.iat;
+
+    if (user.token && realtime <= token_time_exp) {
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Login successfully',
+        data: {
+          token: user.token,
+          refreshToken: user.refresh_token,
+        },
+      };
+    }
+
+    if (
+      user.refresh_token &&
+      TimestampConvert(realtime) < TimestampConvert(refresh_token_time_exp) - 1
+    ) {
+      return {
+        statusCode: HttpStatus.REQUEST_TIMEOUT,
+        message: 'Warm !!!. Need to refresh token to improve quality',
+        data: {
+          refreshToken: user.refresh_token,
+        },
+      };
+    }
   }
 
-  async verifyRefreshToken(
-    refreshToken: string,
-  ): Promise<ApiResponseDto<{ newToken: any; newRefreshToken: any }>> {
-    const { id, username, role } = this.jwtService.decode(refreshToken);
+  async verifyRefreshToken(refreshToken: any): Promise<ApiResponseDto<any>> {
+    const { id, iat, exp } = this.jwtService.decode(refreshToken.refreshToken);
+    console.log(id);
 
-    const email = username;
+    const user = await this.usersRepository.findOne({ where: { id: id } });
+    if (!user) {
+      throw new NotFoundException('Not found user');
+    }
 
-    const token = this.generateTokenService.token(id, email, role);
-    const refresh = this.refreshTokenService.refreshToken(id, email, role);
+    const email = user.email;
+    const role = user.role[0];
 
-    const data = {
-      newToken: (await token).token,
-      newRefreshToken: (await refresh).refreshToken,
-    };
+    const token = this.generateTokenService.token(user.id, email, role);
+
+    let refresh: Promise<{ refreshToken: string }>;
+
+    const refresh_token_time_exp = exp - iat;
+    const get_time = new Date().getTime();
+    const datetime = Math.floor(get_time / 1000);
+    const realtime = datetime - iat;
+
+    if (
+      refreshToken &&
+      TimestampConvert(realtime) >= TimestampConvert(refresh_token_time_exp) - 1
+    ) {
+      refresh = this.refreshTokenService.refreshToken(user.id, email, role);
+      return {
+        statusCode: HttpStatus.REQUEST_TIMEOUT,
+        message: 'Warm !!!. Need to refresh token to improve quality',
+      };
+    }
+
+    // const data = {
+    //   newToken: (await token).token,
+    //   newRefreshToken: (await refresh).refreshToken,
+    // };
 
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Refresh token successful',
-      data: data,
+      message: 'Refresh token successful',
+      data: { token, refresh },
     };
   }
 
@@ -235,7 +298,7 @@ export class AuthService {
 
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Create new password',
+      message: 'Create new password',
       data: {
         email: forgotPasswordDto.email,
         newPassword: forgotPasswordDto.password,

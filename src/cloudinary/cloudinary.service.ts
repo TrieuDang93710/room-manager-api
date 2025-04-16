@@ -1,21 +1,30 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import toStream from 'buffer-to-stream';
-import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
-import { CloudinaryProvider } from './cloudinary.provider';
+import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+import * as toStream from 'buffer-to-stream';
+import cloudinary from 'src/cloudinary.config';
 
 @Injectable()
 export class CloudinaryService {
-  async uploadImage(
+  async uploadFile(
     file: Express.Multer.File,
-  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
-    return new Promise((resole, reject) => {
-      CloudinaryProvider.useFactory();
-      const upload = v2.uploader.upload_stream((error, result) => {
-        if (error) return reject(error);
-        resole(result);
-      });
-      toStream(file.buffer).pipe(upload);
+  ): Promise<UploadApiErrorResponse | UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const upload = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'auto',
+        },
+        (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      );
+      console.log('file: ', file)
+      if (!file.buffer || !Buffer.isBuffer(file.buffer)) {
+        return reject(new Error('file is not a valid buffer'))
+      }
+      const stream = toStream(file.buffer);
+      stream.pipe(upload);
     });
   }
 }

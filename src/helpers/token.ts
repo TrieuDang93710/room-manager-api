@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -20,7 +19,7 @@ export class GenerateTokenService {
     role: string,
   ): Promise<{ token: string }> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    const salt = 10;
+    // const salt = 10;
 
     if (!user) {
       throw new NotAcceptableException('User not found');
@@ -33,7 +32,8 @@ export class GenerateTokenService {
     });
 
     await this.userRepository.update(userId, {
-      token: await bcrypt.hash(token, salt),
+      // token: await bcrypt.hash(token, salt),
+      token: token,
     });
 
     return { token };

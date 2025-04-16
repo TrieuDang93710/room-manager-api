@@ -36,7 +36,7 @@ export class RatingService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Successful',
+      message: 'Successful',
       data: ratings,
     };
   }

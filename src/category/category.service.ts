@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,7 +49,7 @@ export class CategoryService {
     // });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get all category successfully',
+      message: 'Get all category successfully',
       data: {
         result: result,
         totalItems: total,
@@ -69,7 +69,7 @@ export class CategoryService {
     }
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Get category information by id successfully',
+      message: 'Get category information by id successfully',
       data: category,
     };
   }
@@ -81,7 +81,7 @@ export class CategoryService {
     await this.categoryRepository.save(data);
     return {
       statusCode: HttpStatus.CREATED,
-      statusMessage: 'Create new category successfully',
+      message: 'Create new category successfully',
       data: data,
     };
   }
@@ -102,8 +102,28 @@ export class CategoryService {
     });
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Update category by id successfully',
+      message: 'Update category by id successfully',
       data: updateCategory,
+    };
+  }
+
+  async remove(removeDto: any, id: number): Promise<ApiResponseDto<any>> {
+    if (!removeDto) {
+      throw new BadRequestException('Bad request');
+    }
+    const findCategory: any = this.categoryRepository.findOne({
+      where: { id: id },
+    });
+    if (!findCategory) {
+      throw new NotFoundException('Not found company');
+    }
+
+    findCategory.status = removeDto.status;
+    await this.categoryRepository.save(findCategory);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Removed the category successful',
     };
   }
 
@@ -117,7 +137,7 @@ export class CategoryService {
     await this.categoryRepository.delete(id);
     return {
       statusCode: HttpStatus.OK,
-      statusMessage: 'Delete category by id successfully',
+      message: 'Delete category by id successfully',
       data: category,
     };
   }
