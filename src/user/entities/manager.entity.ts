@@ -14,6 +14,7 @@ import { UserEntity } from './user.entity';
 import { PostEntity } from 'src/posts/entities/post.entity';
 import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
 import { PaymentEntity } from 'src/payment/entities/payment.entity';
+import { CompanyEntity } from 'src/company/entities/company.entity';
 
 @Entity('managers')
 export class ManagerEntity {
@@ -51,6 +52,13 @@ export class ManagerEntity {
   })
   @JoinColumn()
   packages: ServicePackageEntity[] | null;
+
+  @OneToOne(() => CompanyEntity, (company) => company.manager, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  company: CompanyEntity | null;
 
   @OneToMany(() => PaymentEntity, (pay) => pay.buyer, {
     nullable: true,

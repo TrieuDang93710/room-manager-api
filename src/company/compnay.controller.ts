@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
@@ -30,11 +31,15 @@ export class CompanyController {
   }
 
   @Post()
+  @Roles(Role.MANAGER, Role.APPLICANT, Role.ADMIN)
+  @UseGuards(AuthGuard(), RolesGuard)
   async createCompany(
     @Body()
     createCompanyDto: CreateCompanyDto,
+    @Req()
+    req: any,
   ) {
-    return this.companyService.create(createCompanyDto);
+    return this.companyService.create(createCompanyDto, req.user);
   }
 
   @Patch('/approve/:id')

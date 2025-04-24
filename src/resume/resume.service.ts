@@ -8,7 +8,7 @@ import {
 import { Query } from 'express-serve-static-core';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { ResumeEntity } from './entities/resume.entity';
-import { Like, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { PostEntity } from 'src/posts/entities/post.entity';
@@ -107,40 +107,139 @@ export class ResumeService {
     const currentPage = Number(query.page) || 1;
     const skip = resPerPage * (currentPage - 1);
 
-    const keyword = query.keyword
-      ? {
-          title: Like(`%${query.keyword}%`),
-        }
-      : {};
+    const queryBuilder = this.resumeRepository
+      .createQueryBuilder('resume')
+      .leftJoin('resume.applies', 'applies')
+      .leftJoin('resume.applicant', 'applicant')
+      .leftJoin('applicant.user', 'user')
+      .leftJoin('user.address', 'address');
 
-    const [result, total] = await this.resumeRepository.findAndCount({
-      where: keyword,
-      relations: {
-        applicant: {
-          user: {
-            address: true,
-          },
-        },
-        applies: true
-      },
-      select: {
-        applicant: {
-          id: true,
-          user: {
-            username: true,
-            email: true,
-            role: true,
-            address: {
-              village: true,
-              district: true,
-              city: true,
-            },
-          },
-        },
-      },
-      take: resPerPage,
-      skip: skip,
-    });
+    queryBuilder.addSelect([
+      'applies.id',
+      'applies.letter',
+      'applies.status',
+      'applies.description',
+      'applicant.id',
+      'user.username',
+      'user.email',
+      'user.role',
+      'user.date_of_birth',
+      'user.gender',
+      'address.national',
+      'address.district',
+      'address.city',
+      'address.village',
+    ]);
+
+    if (query.titles) {
+      const titles = query.titles
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('titles: ', titles);
+
+      if (titles.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            titles.forEach((k: any, idx: any) => {
+              qb.orWhere(`resume.title LIKE :title${idx}`, {
+                [`title${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.jobs) {
+      const jobs = query.jobs
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('jobs: ', jobs);
+
+      if (jobs.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            jobs.forEach((k: any, idx: any) => {
+              qb.orWhere(`resume.job LIKE :job${idx}`, {
+                [`job${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.addresses) {
+      const addresses = query.addresses
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('addresses: ', addresses);
+
+      if (addresses.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            addresses.forEach((k: any, idx: any) => {
+              qb.orWhere(`address.city LIKE :city${idx}`, {
+                [`city${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.levels) {
+      const levels = query.levels
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('levels: ', levels);
+
+      if (levels.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            levels.forEach((k: any, idx: any) => {
+              qb.orWhere(`resume.level LIKE :level${idx}`, {
+                [`level${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.genders) {
+      const genders = query.genders
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('genders: ', genders);
+
+      if (genders.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            genders.forEach((k: any, idx: any) => {
+              qb.orWhere(`user.gender::text LIKE :g_der${idx}`, {
+                [`g_der${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    // pagination
+    queryBuilder.take(resPerPage).skip(skip);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
 
     const totalPages = Math.ceil(total / resPerPage);
 
@@ -156,40 +255,39 @@ export class ResumeService {
     };
   }
 
-  async findById(
-    id: number,
-  ): Promise<ApiResponseDto<ApiResponseDto<ResumeEntity>>> {
-    const resume: any = await this.resumeRepository.findOne({
-      where: { id: id },
-      relations: {
-        applicant: {
-          user: {
-            address: true,
-          },
-        },
-      },
-      select: {
-        applicant: {
-          id: true,
-          user: {
-            username: true,
-            email: true,
-            role: true,
-            date_of_birth: true,
-            phone: true,
-            address: {
-              village: true,
-              district: true,
-              city: true,
-            },
-          },
-        },
-      },
-    });
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const queryBuilder = this.resumeRepository
+      .createQueryBuilder('resume')
+      .leftJoin('resume.applies', 'applies')
+      .leftJoin('resume.applicant', 'applicant')
+      .leftJoin('applicant.user', 'user')
+      .leftJoin('user.address', 'address');
+
+    queryBuilder.addSelect([
+      'applies.id',
+      'applies.letter',
+      'applies.status',
+      'applies.description',
+      'applicant.id',
+      'user.username',
+      'user.email',
+      'user.role',
+      'user.date_of_birth',
+      'user.gender',
+      'address.national',
+      'address.district',
+      'address.city',
+      'address.village',
+    ]);
+    queryBuilder.where('resume.id = :id', { id: id });
+
+    const query = await queryBuilder.getOne();
+
+    const resumeItem = query;
     return {
       statusCode: HttpStatus.OK,
       message: 'Get a resume successfully',
-      data: resume,
+      data: resumeItem,
     };
   }
 

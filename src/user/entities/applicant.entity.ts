@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { PostEntity } from 'src/posts/entities/post.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -14,11 +15,33 @@ import { UserEntity } from './user.entity';
 import { SalaryEntity } from 'src/salary/entities/salary.entity';
 import { ResumeEntity } from 'src/resume/entities/resume.entity';
 import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { CompanyEntity } from 'src/company/entities/company.entity';
 
 @Entity('applicants')
 export class ApplicantEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    default: {},
+    type: 'jsonb',
+    nullable: true,
+  })
+  hobby: object;
+
+  @Column({
+    default: {},
+    type: 'jsonb',
+    nullable: true,
+  })
+  skill: object;
+
+  @Column({
+    default: {},
+    type: 'jsonb',
+    nullable: true,
+  })
+  language: object;
 
   @OneToMany(() => PostEntity, (post) => post.save, {
     nullable: true,
@@ -27,12 +50,12 @@ export class ApplicantEntity {
   @JoinColumn()
   saves: PostEntity[] | null;
 
-  @OneToMany(() => UserEntity, (user) => user.follower, {
+  @OneToMany(() => CompanyEntity, (comp) => comp.applicant, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  followers: UserEntity[] | null;
+  companies: CompanyEntity[] | null;
 
   @OneToMany(() => PostEntity, (post) => post.wishlist, {
     nullable: true,

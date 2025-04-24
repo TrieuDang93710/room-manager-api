@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { Role } from 'src/shared/enums/role.enum';
-import { UpdateUserDto } from './dto/update.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { ApplicantEntity } from './entities/applicant.entity';
 import { ManagerEntity } from './entities/manager.entity';
+import { AddressEntity } from 'src/address/entities/address.entity';
 
 @Injectable()
 export class UserService {
@@ -23,6 +23,8 @@ export class UserService {
     private readonly applicantRepository: Repository<ApplicantEntity>,
     @InjectRepository(ManagerEntity)
     private readonly managerRepository: Repository<ManagerEntity>,
+    @InjectRepository(AddressEntity)
+    private readonly addressRepository: Repository<AddressEntity>,
   ) {}
 
   async findAll(): Promise<ApiResponseDto<UserEntity[]>> {
@@ -35,7 +37,7 @@ export class UserService {
           wishlists: true,
           applies: {
             post: true,
-            resume: true
+            resume: true,
           },
         },
         manager: {
@@ -69,21 +71,43 @@ export class UserService {
     };
   }
 
-  async findById(id: number): Promise<ApiResponseDto<UserEntity>> {
-    const data: any = await this.userRepository.find({
-      where: {
-        id: id,
-      },
-      relations: {
-        address: true,
-        applicant: true,
-        manager: true,
-      },
-    });
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.address', 'address')
+      .leftJoin('user.receiverMessages', 'receiverMessages')
+      .leftJoin('user.senderMessages', 'senderMessages')
+      .leftJoin('user.applicant', 'applicant')
+      .leftJoin('user.manager', 'manager');
+
+    queryBuilder.addSelect([
+      // 'user.token',
+      'address.national',
+      'address.city',
+      'address.district',
+      'address.village',
+      'receiverMessages.text',
+      'receiverMessages.image',
+      'receiverMessages.createAt',
+      'senderMessages.text',
+      'senderMessages.image',
+      'senderMessages.createAt',
+      'applicant.id',
+      'applicant.hobby',
+      'applicant.language',
+      'applicant.skill',
+    ]);
+
+    queryBuilder.where('user.id = :id', { id: id });
+
+    const query = await queryBuilder.getOne();
+
+    const userItem = query;
+
     return {
       statusCode: HttpStatus.OK,
       message: 'Get user successfully',
-      data: data,
+      data: userItem,
     };
   }
 
@@ -223,20 +247,96 @@ export class UserService {
   }
 
   async updateUser(
-    updateUserDto: UpdateUserDto,
+    updateUserDto: any,
     user: UserEntity,
   ): Promise<ApiResponseDto<UserEntity>> {
     const findUser = await this.userRepository.findOne({
       where: { id: user.id },
+      relations: { applicant: true, address: true },
     });
+
     if (!findUser) {
       throw new NotFoundException('Not found user');
     }
+
+    const findAddress = await this.addressRepository.findOne({
+      where: { id: findUser.address.id },
+    });
+
+    if (findUser.role[0] === 'applicant') {
+      const findApplicant = await this.applicantRepository.findOne({
+        where: { id: findUser.applicant.id },
+      });
+
+      await this.applicantRepository.update(findApplicant.id, {
+        hobby: updateUserDto.hobby,
+        skill: updateUserDto.skill,
+        language: updateUserDto.language,
+      });
+    }
+
+    // const findApplicant = await this.applicantRepository.findOne({
+    //   where: { id: findUser.applicant.id },
+    // });
+
+    // await this.applicantRepository.update(findApplicant.id, {
+    //   hobby: updateUserDto.hobby,
+    //   skill: updateUserDto.skill,
+    //   language: updateUserDto.language,
+    // });
+
     await this.userRepository.update(user.id, {
       date_of_birth: updateUserDto.date_of_birth,
       avatar: updateUserDto.avatar,
       phone: updateUserDto.phone,
+      gender: updateUserDto.gender,
     });
+
+    await this.addressRepository.update(findAddress.id, {
+      national: updateUserDto.address.national,
+      city: updateUserDto.address.city,
+      district: updateUserDto.address.district,
+      village: updateUserDto.address.village,
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Update user successful',
+      data: findUser,
+    };
+  }
+
+  async updateOnlyAddress(
+    updateUserDto: any,
+    user: UserEntity,
+  ): Promise<ApiResponseDto<UserEntity>> {
+    const findUser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: { address: true },
+    });
+
+    if (!findUser) {
+      throw new NotFoundException('Not found user');
+    }
+
+    const findAddress = await this.addressRepository.findOne({
+      where: { id: findUser.address.id },
+    });
+
+    await this.userRepository.update(user.id, {
+      date_of_birth: updateUserDto.date_of_birth,
+      avatar: updateUserDto.avatar,
+      phone: updateUserDto.phone,
+      gender: updateUserDto.gender,
+    });
+
+    await this.addressRepository.update(findAddress.id, {
+      national: updateUserDto.address.national,
+      city: updateUserDto.address.city,
+      district: updateUserDto.address.district,
+      village: updateUserDto.address.village,
+    });
+
     return {
       statusCode: HttpStatus.OK,
       message: 'Update user successful',

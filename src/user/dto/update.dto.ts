@@ -13,5 +13,17 @@ export class UpdateUserDto {
   readonly phone: string;
 
   @IsOptional()
-  readonly address: string;
+  readonly gender: string[];
+
+  @IsOptional()
+  readonly skill: object;
+
+  @IsOptional()
+  readonly language: object;
+
+  @IsOptional()
+  readonly hobby: object;
+
+  @IsOptional()
+  readonly address: number;
 }

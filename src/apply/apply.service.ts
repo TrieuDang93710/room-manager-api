@@ -1,5 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -26,16 +30,16 @@ export class ApplyService {
   ) {}
 
   async create(createApplyDto: any, user: any): Promise<ApiResponseDto<any>> {
-    // if (createApplyDto === null || user === null) {
-    //   throw new BadRequestException('Not found request');
-    // }
+    if (!createApplyDto || !user) {
+      throw new NotFoundException('Not found request');
+    }
     const findPost = await this.postRepository.findOne({
-      where: { id: createApplyDto.post },
+      where: { id: Number(createApplyDto.post) },
       relations: { applies: true },
     });
 
     const findResume = await this.resumeRepository.findOne({
-      where: { id: createApplyDto.resume },
+      where: { id: Number(createApplyDto.resume) },
       relations: { applies: true },
     });
 
@@ -55,8 +59,8 @@ export class ApplyService {
     const newApply: any = this.applyRepository.create({
       description: createApplyDto.description,
       letter: createApplyDto.letter,
-      resume: findResume,
       post: findPost,
+      resume: findResume,
       applicant: findApplicant,
     });
     await this.applyRepository.save(newApply);
@@ -180,7 +184,7 @@ export class ApplyService {
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Remove a apply into database'
+      message: 'Remove a apply into database',
     };
   }
 

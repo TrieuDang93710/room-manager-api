@@ -22,6 +22,18 @@ export class MessageService {
   ): Promise<ApiResponseDto<any>> {
     const data: any = await this.messageRepository
       .createQueryBuilder('message')
+      .leftJoin('message.sender', 'sender')
+      .leftJoin('message.receiver', 'receiver')
+      .addSelect([
+        'sender.id',
+        'sender.username',
+        'sender.email',
+        'sender.role',
+        'receiver.id',
+        'receiver.username',
+        'receiver.email',
+        'receiver.role',
+      ])
       .where(
         'message.sender.id = :myId AND message.receiver.id = :userToChatId',
         { myId, userToChatId },

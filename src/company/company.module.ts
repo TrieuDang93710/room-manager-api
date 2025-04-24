@@ -8,6 +8,8 @@ import { CompanyService } from './company.service';
 import { CompanyController } from './compnay.controller';
 import { AddressEntity } from 'src/address/entities/address.entity';
 import { UserModule } from 'src/user/user.module';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { ManagerEntity } from 'src/user/entities/manager.entity';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { UserModule } from 'src/user/user.module';
       PostEntity,
       WorkPlaceEntity,
       AddressEntity,
+      UserEntity,
+      ManagerEntity
     ]),
   ],
   providers: [CompanyService],

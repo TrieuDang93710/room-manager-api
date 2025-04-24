@@ -37,19 +37,19 @@ export class ApplyEntity {
   })
   status: ApplyStatusType[];
 
-  @ManyToOne(() => ResumeEntity, (resume) => resume.applies, {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  resume: ResumeEntity | null;
-
   @ManyToOne(() => PostEntity, (post) => post.applies, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   post: PostEntity | null;
+
+  @ManyToOne(() => ResumeEntity, (resume) => resume.applies, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  resume: ResumeEntity | null;
 
   @ManyToOne(() => ApplicantEntity, (applicant) => applicant.applies, {
     nullable: true,

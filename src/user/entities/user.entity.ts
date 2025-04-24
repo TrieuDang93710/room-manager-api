@@ -42,7 +42,7 @@ export class UserEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @Column({ type: Boolean, default: false })
+  @Column({ type: Boolean, default: false, select: false })
   block: boolean;
 
   @Column({
@@ -53,19 +53,24 @@ export class UserEntity {
   })
   account_type: AccountType[];
 
-  @Column({ type: Boolean, default: false })
+  @Column({ type: Boolean, default: false, select: false })
   active: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   code_id: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   code_expired: string;
 
   @Column({ type: 'enum', enum: Role, array: true, default: [Role.APPLICANT] })
   role: Role[];
 
-  @Column({ type: 'enum', enum: Role, array: true, default: [GenderType.NULL] })
+  @Column({
+    type: 'enum',
+    enum: GenderType,
+    array: true,
+    default: [GenderType.NULL],
+  })
   gender: GenderType[];
 
   @OneToOne(() => AddressEntity, (address) => address.user, {
@@ -108,10 +113,10 @@ export class UserEntity {
   })
   senderMessages: MessageEntity[] | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   token: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   refresh_token: string;
 
   @CreateDateColumn()

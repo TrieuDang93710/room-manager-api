@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsArray, IsObject, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateCompanyDto {
   @IsString()
@@ -9,8 +9,17 @@ export class CreateCompanyDto {
   @IsString()
   readonly logo: string;
 
-  @IsArray()
-  readonly contact: [];
+  @IsOptional()
+  readonly description: string;
+
+  @IsOptional()
+  readonly images: string;
+
+  @IsOptional()
+  readonly scale: string;
+
+  @IsObject()
+  readonly information: object;
 
   @IsObject()
   readonly work_place: object;

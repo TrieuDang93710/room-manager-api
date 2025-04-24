@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Query,
   Req,
   UseGuards,
@@ -114,8 +113,8 @@ export class PostController {
     return this.postService.rating(rating, req.user);
   }
 
-  @Put('/add-to-wishlist/:id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.USER)
+  @Patch('/add-to-wishlist/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async addToWishlist(
     @Req()
@@ -126,8 +125,8 @@ export class PostController {
     return this.postService.addToWishlist(id, req.user);
   }
 
-  @Put('/save/:id')
-  @Roles(Role.ADMIN, Role.USER)
+  @Patch('/save/:id')
+  @Roles(Role.ADMIN, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)
   async saves(
     @Req()
@@ -136,17 +135,5 @@ export class PostController {
     id: number,
   ): Promise<ApplicantEntity> {
     return this.postService.saves(id, req.user);
-  }
-
-  @Put('/follower/:id')
-  @Roles(Role.ADMIN, Role.USER)
-  @UseGuards(AuthGuard(), RolesGuard)
-  async follower(
-    @Param('id')
-    id: number,
-    @Req()
-    req: any,
-  ): Promise<ApplicantEntity> {
-    return this.postService.follower(id, req.user);
   }
 }

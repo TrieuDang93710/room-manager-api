@@ -2,12 +2,15 @@
 
 import { PostEntity } from 'src/posts/entities/post.entity';
 import { FieldStatusType } from 'src/shared/enums/field.enum';
+import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -43,7 +46,7 @@ export class CompanyEntity {
     type: 'jsonb',
     nullable: true,
   })
-  contact: object;
+  information: object;
 
   @Column({
     type: 'enum',
@@ -66,6 +69,20 @@ export class CompanyEntity {
   })
   @JoinColumn()
   posts: PostEntity[] | null;
+
+  @OneToOne(() => ManagerEntity, (manager) => manager.company, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  manager: ManagerEntity | null;
+
+  @ManyToOne(() => ApplicantEntity, (applicant) => applicant.companies, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  applicant: ApplicantEntity[] | null;
 
   @CreateDateColumn()
   createAt: Timestamp;

@@ -11,7 +11,7 @@ import { RatingPostDto } from './dto/rating.dto';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
-import { Like, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CategoryEntity } from 'src/category/entities/category.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { RatingEntity } from 'src/rating/entities/rating.entity';
@@ -47,114 +47,173 @@ export class PostService {
     const currentPage = Number(query.page) || 1;
     const skip = resPerPage * (currentPage - 1);
 
-    const keyword = query.keyword
-      ? {
-          title: Like(`%${query.keyword}%`),
-        }
-      : {};
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.type_of_post', 'type_of_post')
+      .leftJoin('p.require', 'require')
+      .leftJoin('p.ratings', 'ratings')
+      .leftJoin('ratings.userId', 'ratingUser')
+      .leftJoin('p.company', 'company')
+      .leftJoin('company.work_place', 'work_place')
+      .leftJoin('work_place.address', 'address')
+      .leftJoinAndSelect('p.applies', 'applies')
+      .leftJoin('applies.applicant', 'applicant')
+      .leftJoin('applicant.user', 'applicantUser')
+      .leftJoin('applies.post', 'post')
+      .leftJoin('applies.resume', 'resume')
+      .leftJoin('p.createBy', 'createBy')
+      .leftJoin('createBy.packages', 'packages')
+      .leftJoin('createBy.user', 'createUser');
 
-    const [result, total] = await this.postRepository.findAndCount({
-      where: keyword,
-      relations: {
-        type_of_post: true,
-        require: true,
-        ratings: {
-          userId: true,
-        },
-        company: {
-          work_place: {
-            address: true,
-          },
-        },
-        applies: {
-          post: true,
-          resume: true,
-          applicant: {
-            user: true,
-          },
-        },
-        createBy: {
-          packages: true,
-          user: true,
-        },
-      },
-      select: {
-        type_of_post: {
-          title: true,
-          slug: true,
-          description: true,
-        },
-        require: {
-          gender: true,
-          age: true,
-          description: true,
-          quantity: true,
-          experience: true,
-          level: true,
-          education: true,
-          skill: true,
-        },
-        company: {
-          title: true,
-          scale: true,
-          contact: {},
-          images: true,
-          video: true,
-          logo: true,
-          work_place: {
-            coordinate: true,
-            latitude: true,
-            address: {
-              national: true,
-              city: true,
-              district: true,
-              village: true,
-            },
-          },
-        },
-        createBy: {
-          account_pay: true,
-          news: true,
-          packages: {
-            news_quantity: true,
-            payments: true,
-            price: true,
-          },
-          user: {
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
-        ratings: {
-          id: true,
-          star: true,
-          comment: true,
-          userId: {
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
-        applies: {
-          id: true,
-          description: true,
-          letter: {},
-          createAt: {},
-          status: true,
-          applicant: {
-            id: true,
-            user: {
-              username: true,
-              email: true,
-              role: true,
-            },
-          },
-        },
-      },
-      take: resPerPage,
-      skip: skip,
-    });
+    queryBuilder.addSelect(['type_of_post.title', 'type_of_post.slug']);
+    queryBuilder.addSelect([
+      'require.gender',
+      'require.age',
+      'require.experience',
+      'require.level',
+      'require.quantity',
+      'require.education',
+      'require.description',
+    ]);
+    queryBuilder.addSelect(['ratings.star', 'ratings.comment']);
+    queryBuilder.addSelect([
+      'ratingUser.username',
+      'ratingUser.email',
+      'ratingUser.role',
+    ]);
+    queryBuilder.addSelect([
+      'company.title',
+      'company.logo',
+      'company.scale',
+      'company.information',
+      'company.status',
+    ]);
+    queryBuilder.addSelect(['work_place.coordinate', 'work_place.latitude']);
+    queryBuilder.addSelect([
+      'address.national',
+      'address.city',
+      'address.district',
+      'address.village',
+    ]);
+
+    queryBuilder.addSelect([
+      'applies.letter',
+      'applies.status',
+      'applies.createAt',
+    ]);
+    queryBuilder.addSelect([
+      'applicant.id',
+      'applicantUser.id',
+      'applicantUser.avatar',
+      'applicantUser.username',
+      'applicantUser.email',
+      'applicantUser.role',
+    ]);
+    queryBuilder.addSelect(['post.title', 'post.description', 'post.views']);
+    queryBuilder.addSelect([
+      'resume.title',
+      'resume.job',
+      'resume.target',
+      'resume.image',
+      'resume.description',
+      'resume.status',
+    ]);
+    queryBuilder.addSelect(['createBy.social', 'createBy.news']);
+    queryBuilder.addSelect([
+      'createUser.username',
+      'createUser.email',
+      'createUser.role',
+    ]);
+    queryBuilder.addSelect(['packages.price', 'packages.news_quantity']);
+
+    // find with keyword
+    if (query.titles) {
+      const titles = query.titles
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('titles: ', titles);
+
+      if (titles.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            titles.forEach((k: any, idx: any) => {
+              qb.orWhere(`post.title LIKE :title${idx}`, {
+                [`title${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.fields) {
+      const fields = query.fields
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('fields: ', fields);
+
+      if (fields.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            fields.forEach((k: any, idx: any) => {
+              qb.orWhere(`type_of_post.title LIKE :title${idx}`, {
+                [`title${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.addresses) {
+      const addresses = query.addresses
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('addresses: ', addresses);
+
+      if (addresses.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            addresses.forEach((k: any, idx: any) => {
+              qb.orWhere(`address.city LIKE :city${idx}`, {
+                [`city${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+
+    if (query.workTypes) {
+      const workTypes = query.workTypes
+        .toString()
+        .split(',')
+        .filter((k: any) => k !== '');
+
+      console.log('workTypes: ', workTypes);
+
+      if (workTypes.length) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            workTypes.forEach((k: any, idx: any) => {
+              qb.orWhere(`post.work_type::text LIKE :work_type${idx}`, {
+                [`work_type${idx}`]: `%${k}%`,
+              });
+            });
+          }),
+        );
+      }
+    }
+    // pagination
+    queryBuilder.take(resPerPage).skip(skip);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
 
     const totalPages = Math.ceil(total / resPerPage);
 
@@ -170,114 +229,90 @@ export class PostService {
     };
   }
 
-  async findById(id: number): Promise<ApiResponseDto<PostEntity>> {
-    const room = await this.postRepository.findOne({
-      where: {
-        id: id,
-      },
-      relations: {
-        type_of_post: true,
-        require: true,
-        ratings: {
-          userId: true,
-        },
-        company: {
-          work_place: {
-            address: true,
-          },
-        },
-        createBy: {
-          packages: true,
-          user: true,
-        },
-        applies: {
-          post: true,
-          resume: true,
-          applicant: {
-            user: true,
-          },
-        },
-      },
-      select: {
-        type_of_post: {
-          title: true,
-          slug: true,
-          description: true,
-        },
-        require: {
-          gender: true,
-          age: true,
-          description: true,
-          quantity: true,
-          experience: true,
-          level: true,
-          education: true,
-          skill: true,
-        },
-        company: {
-          title: true,
-          scale: true,
-          contact: {},
-          logo: true,
-          work_place: {
-            coordinate: true,
-            latitude: true,
-            address: {
-              national: true,
-              city: true,
-              district: true,
-              village: true,
-            },
-          },
-        },
-        createBy: {
-          account_pay: true,
-          news: true,
-          packages: {
-            news_quantity: true,
-            payments: true,
-            price: true,
-          },
-          user: {
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
-        ratings: {
-          id: true,
-          star: true,
-          comment: true,
-          userId: {
-            username: true,
-            email: true,
-            role: true,
-          },
-        },
-        applies: {
-          id: true,
-          status: true,
-          description: true,
-          letter: {},
-          createAt: {},
-          applicant: {
-            id: true,
-            user: {
-              username: true,
-              email: true,
-              role: true,
-            },
-          },
-        },
-      },
-    });
-    if (!room) {
-      throw new NotFoundException('Not found room by id');
-    }
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.type_of_post', 'type_of_post')
+      .leftJoin('p.require', 'require')
+      .leftJoin('p.ratings', 'ratings')
+      .leftJoin('ratings.userId', 'ratingUser')
+      .leftJoin('p.company', 'company')
+      .leftJoin('company.work_place', 'work_place')
+      .leftJoin('work_place.address', 'address')
+      .leftJoin('p.applies', 'applies')
+      .leftJoin('applies.applicant', 'applicant')
+      .leftJoin('applicant.user', 'applicantUser')
+      .leftJoin('applies.post', 'post')
+      .leftJoin('applies.resume', 'resume')
+      .leftJoin('p.createBy', 'createBy')
+      .leftJoin('createBy.packages', 'packages')
+      .leftJoin('createBy.user', 'createUser');
+
+    queryBuilder.addSelect(['type_of_post.title', 'type_of_post.slug']);
+    queryBuilder.addSelect([
+      'require.gender',
+      'require.age',
+      'require.experience',
+      'require.level',
+      'require.quantity',
+      'require.education',
+      'require.description',
+    ]);
+    queryBuilder.addSelect(['ratings.star', 'ratings.comment']);
+    queryBuilder.addSelect([
+      'ratingUser.username',
+      'ratingUser.email',
+      'ratingUser.role',
+    ]);
+    queryBuilder.addSelect([
+      'company.title',
+      'company.logo',
+      'company.scale',
+      'company.information',
+      'company.status',
+      'work_place.coordinate',
+      'work_place.latitude',
+    ]);
+    // queryBuilder.addSelect(['work_place.coordinate', 'work_place.latitude']);
+    queryBuilder.addSelect([
+      'address.national',
+      'address.city',
+      'address.district',
+      'address.village',
+    ]);
+    queryBuilder.addSelect(['applies.letter', 'applies.status']);
+    queryBuilder.addSelect([
+      'applicantUser.username',
+      'applicantUser.email',
+      'applicantUser.role',
+    ]);
+    queryBuilder.addSelect(['post.title', 'post.description', 'post.views']);
+    queryBuilder.addSelect([
+      'resume.title',
+      'resume.job',
+      'resume.target',
+      'resume.image',
+      'resume.description',
+      'resume.status',
+    ]);
+    queryBuilder.addSelect(['createBy.social', 'createBy.news']);
+    queryBuilder.addSelect([
+      'createUser.username',
+      'createUser.email',
+      'createUser.role',
+    ]);
+    queryBuilder.addSelect(['packages.price', 'packages.news_quantity']);
+
+    queryBuilder.where('p.id = :id', { id: id });
+
+    const query = await queryBuilder.getOne();
+
+    const postItem = query;
+
     return {
       statusCode: HttpStatus.OK,
-      message: 'Get a room successfully',
-      data: room,
+      message: 'Get a post successfully',
+      data: postItem,
     };
   }
 
@@ -611,46 +646,36 @@ export class PostService {
 
   async addToWishlist(id: number, user: UserEntity): Promise<ApplicantEntity> {
     const findUser = await this.userRepository.findOne({
-      where: {
-        id: user.id,
-      },
-      relations: {
-        applicant: true,
-        manager: true,
-      },
+      where: { id: user.id },
+      relations: { applicant: true },
     });
-    console.log('user: =>', findUser);
 
-    const findRoom = await this.postRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
-    const tenantId = findUser.applicant;
+    const findPost = await this.postRepository.findOne({ where: { id: id } });
+    const applicantId = findUser.applicant;
 
-    const findTenantModel = await this.applicantRepository.findOne({
-      where: { id: tenantId.id },
+    const findApplicant = await this.applicantRepository.findOne({
+      where: { id: applicantId.id },
       relations: { wishlists: true },
     });
 
-    const wishlists = findTenantModel.wishlists;
+    const wishlists = findApplicant.wishlists;
 
-    const alreadyWishlist = findTenantModel.wishlists.some(
-      (room) => room.id === findRoom.id,
+    const alreadyWishlist = findApplicant.wishlists.some(
+      (post) => post.id === findPost.id,
     );
 
     if (wishlists === null) {
-      findTenantModel.wishlists.push(findRoom);
-      return this.applicantRepository.save(findTenantModel);
+      findApplicant.wishlists.push(findPost);
+      return this.applicantRepository.save(findApplicant);
     } else {
       if (alreadyWishlist) {
-        findTenantModel.wishlists = findTenantModel.wishlists.filter(
-          (room) => room.id !== findRoom.id,
+        findApplicant.wishlists = findApplicant.wishlists.filter(
+          (room) => room.id !== findPost.id,
         );
-        return this.applicantRepository.save(findTenantModel);
+        return this.applicantRepository.save(findApplicant);
       } else {
-        findTenantModel.wishlists.push(findRoom);
-        return this.applicantRepository.save(findTenantModel);
+        findApplicant.wishlists.push(findPost);
+        return this.applicantRepository.save(findApplicant);
       }
     }
   }
@@ -666,81 +691,36 @@ export class PostService {
       },
     });
 
-    const findRoom = await this.postRepository.findOne({
+    const findPost = await this.postRepository.findOne({
       where: {
         id: id,
       },
     });
-    const tenantId = findUser.applicant;
+    const applicantId = findUser.applicant;
 
-    const findTenantModel = await this.applicantRepository.findOne({
-      where: { id: tenantId.id },
+    const findApplicant = await this.applicantRepository.findOne({
+      where: { id: applicantId.id },
       relations: { saves: true },
     });
 
-    const saves = findTenantModel.saves;
+    const saves = findApplicant.saves;
 
-    const alreadySave = findTenantModel.saves.some(
-      (room) => room.id === findRoom.id,
+    const alreadySave = findApplicant.saves.some(
+      (room) => room.id === findPost.id,
     );
 
     if (saves === null) {
-      findTenantModel.saves.push(findRoom);
-      return this.applicantRepository.save(findTenantModel);
+      findApplicant.saves.push(findPost);
+      return this.applicantRepository.save(findApplicant);
     } else {
       if (alreadySave) {
-        findTenantModel.saves = findTenantModel.saves.filter(
-          (room) => room.id !== findRoom.id,
+        findApplicant.saves = findApplicant.saves.filter(
+          (room) => room.id !== findPost.id,
         );
-        return this.applicantRepository.save(findTenantModel);
+        return this.applicantRepository.save(findApplicant);
       } else {
-        findTenantModel.saves.push(findRoom);
-        return this.applicantRepository.save(findTenantModel);
-      }
-    }
-  }
-
-  async follower(id: number, user: UserEntity): Promise<ApplicantEntity> {
-    const findUser = await this.userRepository.findOne({
-      where: {
-        id: user.id,
-      },
-      relations: {
-        applicant: true,
-        manager: true,
-      },
-    });
-
-    const follower = await this.userRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
-    const tenantId = findUser.applicant;
-
-    const findTenantModel = await this.applicantRepository.findOne({
-      where: { id: tenantId.id },
-      relations: { followers: true },
-    });
-
-    const followers = findTenantModel.followers;
-
-    const alreadyFollower = findTenantModel.followers.some(
-      (fl) => fl.id === follower.id,
-    );
-
-    if (followers === null) {
-      findTenantModel.followers.push(follower);
-      return this.applicantRepository.save(findTenantModel);
-    } else {
-      if (alreadyFollower) {
-        findTenantModel.followers = findTenantModel.followers.filter(
-          (fl) => fl.id !== follower.id,
-        );
-        return this.applicantRepository.save(findTenantModel);
-      } else {
-        findTenantModel.followers.push(follower);
-        return this.applicantRepository.save(findTenantModel);
+        findApplicant.saves.push(findPost);
+        return this.applicantRepository.save(findApplicant);
       }
     }
   }
