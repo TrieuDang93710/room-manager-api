@@ -21,11 +21,13 @@ export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Get()
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async getPayments() {
     return this.paymentService.findAll();
   }
 
-  @Post('/contract/:id')
+  @Post('/new/:id')
   @Roles(Role.ADMIN, Role.MANAGER, Role.USER)
   @UseGuards(AuthGuard(), RolesGuard)
   async createPayment(
@@ -40,11 +42,23 @@ export class PaymentController {
   }
 
   @Get('/:id')
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async getPaymentById(
     @Param('id')
     id: number,
   ) {
     return this.paymentService.findById(id);
+  }
+
+  @Get('/email/:email')
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async getPaymentByEmail(
+    @Param('email')
+    email: string,
+  ) {
+    return this.paymentService.findByEmail(email);
   }
 
   @Put('/:id')
@@ -67,5 +81,11 @@ export class PaymentController {
     id: number,
   ) {
     return this.paymentService.deleteById(id);
+  }
+
+  @Post('/create-payment-intent')
+  async createPaymentIntent(@Body() body: { price: string }) {
+    const paymentIntent = await this.paymentService.createPaymentIntent(body);
+    return { clientSecret: paymentIntent.client_secret };
   }
 }

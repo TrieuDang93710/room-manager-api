@@ -9,24 +9,24 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Query as ExpressQuery } from 'express-serve-static-core'; 
-import { ServicePackageService } from './service_package.service';
+import { Query as ExpressQuery } from 'express-serve-static-core';
+import { NewsService } from './news.service';
 import { Roles } from 'src/user/decorators/role.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/user/guards/role.guard';
 import { Role } from 'src/shared/enums/role.enum';
-import { CreateDto } from './dto/create.dto';
+import { CreateNewsDto } from './dto/create.dto';
 
-@Controller('service-package')
-export class ServicePackageController {
-  constructor(private readonly servicePackageService: ServicePackageService) {}
+@Controller('news')
+export class NewsController {
+  constructor(private readonly newsService: NewsService) {}
 
   @Get()
-  async getServicePackage(
+  async getNewses(
     @Query()
     query: ExpressQuery,
   ) {
-    return this.servicePackageService.findAll(query);
+    return this.newsService.findAll(query);
   }
 
   @Post()
@@ -34,9 +34,17 @@ export class ServicePackageController {
   @UseGuards(AuthGuard(), RolesGuard)
   async createNews(
     @Body()
-    newDto: CreateDto,
+    newsDto: CreateNewsDto,
   ) {
-    return this.servicePackageService.create(newDto);
+    return this.newsService.create(newsDto);
+  }
+
+  @Get('/:id')
+  async getById(
+    @Param('id')
+    id: number,
+  ) {
+    return this.newsService.findById(id);
   }
 
   @Patch('/remove/:id')
@@ -46,6 +54,6 @@ export class ServicePackageController {
     @Param('id')
     id: number,
   ) {
-    return this.servicePackageService.remove(id);
+    return this.newsService.remove(id);
   }
 }

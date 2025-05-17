@@ -28,6 +28,7 @@ import { WorkPlaceModule } from './work_place/work_place.module';
 import { CompanyModule } from './company/company.module';
 import { ApplyModule } from './apply/apply.module';
 import { ServicePackageModule } from './service_package/service_package.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ServicePackageModule } from './service_package/service_package.module';
     ServicePackageModule,
     WorkPlaceModule,
     CompanyModule,
+    NewsModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async () => ({

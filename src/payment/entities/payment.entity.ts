@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
-import { PaymentMethod, PaymentType } from 'src/shared/enums/payment.enum';
+import { PaymentMethod, PaymentStatus } from 'src/shared/enums/payment.enum';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import {
   Column,
@@ -18,7 +18,13 @@ export class PaymentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  paymentId: string;
+
+  @Column({ nullable: true })
   paymentDate: string;
 
   @Column({
@@ -31,20 +37,23 @@ export class PaymentEntity {
 
   @Column({
     type: 'enum',
-    enum: PaymentType,
+    enum: PaymentStatus,
     array: true,
-    default: [PaymentType.MONTHLY],
+    default: [PaymentStatus.NOT_SUCCEED],
   })
-  paymentType: PaymentType[];
+  status: PaymentStatus[];
 
-  @Column()
-  amount: number;
+  @Column({ nullable: true })
+  cardType: string;
 
-  @Column()
+  @Column({ nullable: true })
+  amount: string;
+
+  @Column({ nullable: true })
   surcharge: number;
 
   @Column({ default: 0 })
-  total: number;
+  total: string;
 
   @ManyToOne(() => ServicePackageEntity, (pck) => pck.payments, {
     nullable: true,

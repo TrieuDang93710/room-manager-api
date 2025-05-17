@@ -68,7 +68,7 @@ export class UserController {
     return this.userService.findAdminByEmail(email);
   }
 
-  @Get('/:email')
+  @Get('/email/:email')
   // @Roles(Role.ADMIN, Role.USER)
   // @UseGuards(AuthGuard(), RolesGuard)
   async getUserByEmail(

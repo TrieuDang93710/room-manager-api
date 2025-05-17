@@ -45,7 +45,7 @@ export class CompanyService {
       .leftJoin('company.work_place', 'work_place')
       .leftJoin('work_place.address', 'address')
       .leftJoin('company.manager', 'manager')
-      .leftJoin('manager.user', 'user')
+      .leftJoin('manager.user', 'user');
 
     queryBuilder.addSelect([
       'company.title',
@@ -132,8 +132,25 @@ export class CompanyService {
     };
   }
 
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const findCompany = await this.companyRepository.findOne({
+      where: { id: Number(id) },
+      relations: { posts: true, work_place: { address: true } },
+    });
+
+    if (!findCompany) {
+      throw new NotFoundException('Not found company');
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get the company successful',
+      data: findCompany,
+    };
+  }
+
   async create(createCompanyDto: any, user: any): Promise<ApiResponseDto<any>> {
-    const { title, logo, description, scale,images, information, work_place } =
+    const { title, logo, description, scale, images, information, work_place } =
       createCompanyDto;
 
     if (!work_place) {

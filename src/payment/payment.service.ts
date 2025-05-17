@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentEntity } from './entities/payment.entity';
@@ -8,6 +13,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { Role } from 'src/shared/enums/role.enum';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
+import { Stripe } from 'stripe';
 
 @Injectable()
 export class PaymentService {
@@ -21,6 +27,10 @@ export class PaymentService {
     @InjectRepository(ServicePackageEntity)
     private readonly servicePackageEntity: Repository<ServicePackageEntity>,
   ) {}
+
+  private readonly stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}`, {
+    apiVersion: '2025-04-30.basil',
+  });
 
   async findAll(): Promise<ApiResponseDto<PaymentEntity[]>> {
     const data = await this.paymentRepository.find({
@@ -41,16 +51,20 @@ export class PaymentService {
     user: UserEntity,
     id: number,
   ): Promise<ApiResponseDto<any>> {
-    if (user.role[0] !== Role.USER) {
+    if (user.role[0] !== Role.MANAGER) {
       throw new NotAcceptableException(
-        'Only user role allow to create new payment',
+        'Only manager role allow to create new payment',
       );
     }
-    const findUser: any = await this.userRepository.findOne({
+    const findUser = await this.userRepository.findOne({
       where: {
         id: user.id,
       },
       relations: { manager: true },
+    });
+
+    const manager = await this.managerRepository.findOne({
+      where: { id: findUser.manager.id },
     });
 
     const findServicePackage = await this.servicePackageEntity.findOne({
@@ -58,33 +72,38 @@ export class PaymentService {
     });
 
     const newPayment = this.paymentRepository.create({
+      email: createPaymentDto.email,
       amount: createPaymentDto.amount,
       surcharge: createPaymentDto.surcharge,
+      total: createPaymentDto.total,
+      paymentMethod: createPaymentDto.paymentMethod,
+      paymentDate: createPaymentDto.paymentDate,
+      cardType: createPaymentDto.cardType,
+      status: createPaymentDto.status,
+      paymentId: createPaymentDto.paymentId,
+      buyer: manager,
+      package: findServicePackage,
     });
-
-    if (createPaymentDto.paymentType !== null) {
-      newPayment.paymentType = createPaymentDto.paymentType;
-    }
-
-    if (createPaymentDto.paymentMethod !== null) {
-      newPayment.paymentMethod = createPaymentDto.paymentMethod;
-    }
 
     await this.paymentRepository.save(newPayment);
 
     const findManager = await this.managerRepository.findOne({
-      where: { id: findUser.manager },
+      where: { id: manager.id },
       relations: { account_pay: true },
     });
 
     if (!findManager.account_pay) {
       findManager.account_pay = [newPayment];
+      findManager.packages = [findServicePackage];
+      findManager.news = findManager.news + findServicePackage.news_quantity
     } else {
       const paymentAlreadyExisted = findManager.account_pay.some(
         (pay) => pay.id === newPayment.id,
       );
       if (!paymentAlreadyExisted) {
         findManager.account_pay = [...findManager.account_pay, newPayment];
+        findManager.packages = [...findManager.packages, findServicePackage];
+        findManager.news = findManager.news + findServicePackage.news_quantity
       }
     }
 
@@ -124,6 +143,18 @@ export class PaymentService {
     };
   }
 
+  async findByEmail(email: string): Promise<ApiResponseDto<PaymentEntity[]>> {
+    const data = await this.paymentRepository.find();
+    const filter = data.filter(
+      (item: any) => item.email === email,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get a payment by email successfully',
+      data: filter,
+    };
+  }
+
   async updateById(
     id: number,
     updatePaymentDto: any,
@@ -146,5 +177,20 @@ export class PaymentService {
       message: 'Update payment method successfully',
       data: result,
     };
+  }
+
+  async createPaymentIntent(
+    body: any,
+  ): Promise<Stripe.Response<Stripe.PaymentIntent>> {
+    if (!body) {
+      throw new NotFoundException('Not found body');
+    }
+    const pr = (Number(body.price) / 25930) * 100;
+    const amount = Number(pr.toFixed());
+    return this.stripe.paymentIntents.create({
+      amount,
+      currency: 'usd',
+      payment_method_types: ['card'],
+    });
   }
 }

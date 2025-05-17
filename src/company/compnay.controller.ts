@@ -42,6 +42,14 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto, req.user);
   }
 
+  @Get('/:id')
+  async getACompany(
+    @Param('id')
+    id: number,
+  ) {
+    return this.companyService.findById(id);
+  }
+
   @Patch('/approve/:id')
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard(), RolesGuard)

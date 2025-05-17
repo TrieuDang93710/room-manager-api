@@ -18,7 +18,6 @@ import { Roles } from '../user/decorators/role.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { UpdatePostDto } from './dto/update.dto';
-import { RatingPostDto } from './dto/rating.dto';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { PostService } from './post.service';
 import { DelPostDto } from './dto/del.dto';
@@ -99,18 +98,6 @@ export class PostController {
     id: number,
   ) {
     return this.postService.findById(id);
-  }
-
-  @Post('/create-rating')
-  @Roles(Role.TENANT, Role.ADMIN, Role.USER)
-  @UseGuards(AuthGuard(), RolesGuard)
-  async createRating(
-    @Body()
-    rating: RatingPostDto,
-    @Req()
-    req: any,
-  ) {
-    return this.postService.rating(rating, req.user);
   }
 
   @Patch('/add-to-wishlist/:id')

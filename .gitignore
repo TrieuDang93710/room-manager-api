@@ -2,10 +2,9 @@
 /dist
 /node_modules
 /db/migrations
-/src/.env
-/src/note.md
+/note.md
 
-.env*.local
+.env*
 
 # Logs
 logs

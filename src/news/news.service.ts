@@ -1,22 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ServicePackageEntity } from './entities/service_package.entity';
+import { NewsEntity } from './entities/news.entity';
 import { Repository } from 'typeorm';
 import { Query } from 'express-serve-static-core';
-import { PaymentEntity } from 'src/payment/entities/payment.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { ApiResponseDto } from 'src/dto/response.dto';
 
 @Injectable()
-export class ServicePackageService {
+export class NewsService {
   constructor(
-    @InjectRepository(ServicePackageEntity)
-    private readonly servicePackageRepository: Repository<ServicePackageEntity>,
-    @InjectRepository(PaymentEntity)
-    private readonly paymentRepository: Repository<PaymentEntity>,
-    @InjectRepository(ManagerEntity)
-    private readonly managerRepository: Repository<ManagerEntity>,
+    @InjectRepository(NewsEntity)
+    private readonly newsRepository: Repository<NewsEntity>,
   ) {}
 
   async findAll(query: Query): Promise<ApiResponseDto<any>> {
@@ -24,9 +18,7 @@ export class ServicePackageService {
     const currentPage = Number(query.page) || 1;
     const skip = resPerPage * (currentPage - 1);
 
-    const queryBuilder =
-      this.servicePackageRepository.createQueryBuilder('ser_package');
-
+    const queryBuilder = this.newsRepository.createQueryBuilder('news');
     // pagination
     queryBuilder.take(resPerPage).skip(skip);
 
@@ -36,7 +28,7 @@ export class ServicePackageService {
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Get all service package successfully',
+      message: 'Get all news successfully',
       data: {
         result: result,
         totalItems: total,
@@ -46,37 +38,49 @@ export class ServicePackageService {
     };
   }
 
-  async create(newDto: any): Promise<ApiResponseDto<any>> {
-    if (!newDto) {
+  async create(newsDto: any): Promise<ApiResponseDto<any>> {
+    if (!newsDto) {
       throw new NotFoundException('Not found request');
     }
 
-    const res = this.servicePackageRepository.create(newDto);
-    await this.servicePackageRepository.save(res);
+    const res = this.newsRepository.create(newsDto);
+    await this.newsRepository.save(res);
 
     return {
       statusCode: HttpStatus.CREATED,
-      message: 'Create new service package successfully',
+      message: 'Create new news successfully',
       data: res,
     };
   }
 
-  async remove(id: number): Promise<ApiResponseDto<any>> {
-    const findNews = await this.servicePackageRepository.findOne({
-      where: { id: id },
-    });
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const findNews = await this.newsRepository.findOne({ where: { id: id } });
 
     if (!findNews) {
       throw new NotFoundException('Not found news by id');
     }
 
-    await this.servicePackageRepository.update(id, {
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Remove news successfully',
+      data: findNews,
+    };
+  }
+
+  async remove(id: number): Promise<ApiResponseDto<any>> {
+    const findNews = await this.newsRepository.findOne({ where: { id: id } });
+
+    if (!findNews) {
+      throw new NotFoundException('Not found news by id');
+    }
+
+    await this.newsRepository.update(id, {
       status: true,
     });
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Remove service package successfully',
+      message: 'Remove news successfully',
     };
   }
 }

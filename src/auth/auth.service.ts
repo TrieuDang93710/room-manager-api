@@ -23,6 +23,7 @@ import { AddressEntity } from 'src/address/entities/address.entity';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { TimestampConvert } from 'src/helpers/convert';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -39,10 +40,11 @@ export class AuthService {
     @InjectRepository(ManagerEntity)
     private readonly managerRepository: Repository<ManagerEntity>,
 
-    private jwtService: JwtService,
-    private generateTokenService: GenerateTokenService,
-    private refreshTokenService: RefreshTokenService,
+    private readonly jwtService: JwtService,
+    private readonly generateTokenService: GenerateTokenService,
+    private readonly refreshTokenService: RefreshTokenService,
     private readonly mailerService: MailerService,
+    private readonly userService: UserService,
   ) {}
 
   async signUp(signUpDto: any): Promise<ApiResponseDto<any>> {
@@ -155,9 +157,17 @@ export class AuthService {
   async signIn(signInDto: SignInDto): Promise<ApiResponseDto<any>> {
     const { email, password } = signInDto;
 
-    const user = await this.usersRepository.findOne({
-      where: { email: email },
-    });
+    // const user = await this.usersRepository.findOne({
+    //   where: { email: email },
+    // });
+    let user: any
+    await this.userService.findUserByEmail(email).then((result) => {
+      user = result.data
+      // console.log('user: ', user);
+    }).catch((error) => {
+      console.log('error: ', error)
+    })
+
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!user) {
@@ -168,9 +178,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password.');
     }
 
-    let data: { token: string; refreshToken: string };
-
     if (!user.token && !user.refresh_token) {
+      // let data: { token: any; refreshToken: any };
+
       const token = this.generateTokenService.token(
         user.id,
         user.email,
@@ -183,15 +193,18 @@ export class AuthService {
         user.role[0],
       );
 
-      data = {
-        token: (await token).token,
-        refreshToken: (await refresh).refreshToken,
-      };
+      // const data = {
+      //   token: (await token).token,
+      //   refreshToken: (await refresh).refreshToken,
+      // };
 
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Login successfully',
-        data: data,
+        data: {
+          token: (await token).token,
+          refreshToken: (await refresh).refreshToken,
+        },
       };
     }
 
@@ -206,6 +219,10 @@ export class AuthService {
     const realtime = datetime - decodeToken.iat;
 
     if (user.token && realtime <= token_time_exp) {
+      // data = {
+      //   token: user.token,
+      //   refreshToken: user.refresh_token,
+      // };
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Login successfully',
@@ -220,6 +237,10 @@ export class AuthService {
       user.refresh_token &&
       TimestampConvert(realtime) < TimestampConvert(refresh_token_time_exp) - 1
     ) {
+      // data = {
+      //   token: user.token,
+      //   refreshToken: user.refresh_token,
+      // };
       return {
         statusCode: HttpStatus.REQUEST_TIMEOUT,
         message: 'Warm !!!. Need to refresh token to improve quality',
@@ -228,6 +249,12 @@ export class AuthService {
         },
       };
     }
+
+    // return {
+    //   statusCode: HttpStatus.CREATED,
+    //   message: 'Login successfully',
+    //   data: data,
+    // };
   }
 
   async verifyRefreshToken(refreshToken: any): Promise<ApiResponseDto<any>> {
