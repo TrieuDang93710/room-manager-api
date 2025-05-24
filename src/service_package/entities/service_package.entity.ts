@@ -18,6 +18,12 @@ export class ServicePackageEntity {
   id: number;
 
   @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  note: string;
+
+  @Column({ nullable: true })
   price: number;
 
   @Column({ default: 5 })
@@ -34,6 +40,9 @@ export class ServicePackageEntity {
     onDelete: 'CASCADE',
   })
   manager: ManagerEntity | null;
+
+  @Column({ type: 'bool', default: false })
+  status: boolean;
 
   @CreateDateColumn()
   createAt: Timestamp;

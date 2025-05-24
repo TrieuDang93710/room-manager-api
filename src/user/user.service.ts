@@ -111,19 +111,36 @@ export class UserService {
     };
   }
 
-  async findUserByEmail(email: string): Promise<ApiResponseDto<UserEntity>> {
-    const data = await this.userRepository.findOne({
-      where: {
-        email: email,
-      },
-    });
-    if (!data) {
-      throw new NotFoundException('Not found user by this email');
-    }
+  async findUserByEmail(email: string): Promise<ApiResponseDto<any>> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.address', 'address')
+      .leftJoin('user.applicant', 'applicant')
+      .leftJoin('user.manager', 'manager');
+
+    queryBuilder.addSelect([
+      'user.token',
+      'user.refresh_token',
+      'address.national',
+      'address.city',
+      'address.district',
+      'address.village',
+      'applicant.id',
+      'applicant.hobby',
+      'applicant.language',
+      'applicant.skill',
+    ]);
+
+    queryBuilder.where('user.email = :email', { email: email });
+
+    const query = await queryBuilder.getOne();
+
+    const userItem = query;
+
     return {
       statusCode: HttpStatus.OK,
       message: 'Get a user by email successfully',
-      data: data,
+      data: userItem,
     };
   }
 

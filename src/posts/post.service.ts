@@ -7,14 +7,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
-import { RatingPostDto } from './dto/rating.dto';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
 import { Brackets, Repository } from 'typeorm';
 import { CategoryEntity } from 'src/category/entities/category.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { RatingEntity } from 'src/rating/entities/rating.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { Role } from 'src/shared/enums/role.enum';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
@@ -30,8 +28,6 @@ export class PostService {
     private readonly categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(RatingEntity)
-    private readonly ratingRepository: Repository<RatingEntity>,
     @InjectRepository(ManagerEntity)
     private readonly managerRepository: Repository<ManagerEntity>,
     @InjectRepository(ApplicantEntity)
@@ -51,8 +47,6 @@ export class PostService {
       .createQueryBuilder('p')
       .leftJoin('p.type_of_post', 'type_of_post')
       .leftJoin('p.require', 'require')
-      .leftJoin('p.ratings', 'ratings')
-      .leftJoin('ratings.userId', 'ratingUser')
       .leftJoin('p.company', 'company')
       .leftJoin('company.work_place', 'work_place')
       .leftJoin('work_place.address', 'address')
@@ -74,12 +68,6 @@ export class PostService {
       'require.quantity',
       'require.education',
       'require.description',
-    ]);
-    queryBuilder.addSelect(['ratings.star', 'ratings.comment']);
-    queryBuilder.addSelect([
-      'ratingUser.username',
-      'ratingUser.email',
-      'ratingUser.role',
     ]);
     queryBuilder.addSelect([
       'company.title',
@@ -234,8 +222,6 @@ export class PostService {
       .createQueryBuilder('p')
       .leftJoin('p.type_of_post', 'type_of_post')
       .leftJoin('p.require', 'require')
-      .leftJoin('p.ratings', 'ratings')
-      .leftJoin('ratings.userId', 'ratingUser')
       .leftJoin('p.company', 'company')
       .leftJoin('company.work_place', 'work_place')
       .leftJoin('work_place.address', 'address')
@@ -257,12 +243,6 @@ export class PostService {
       'require.quantity',
       'require.education',
       'require.description',
-    ]);
-    queryBuilder.addSelect(['ratings.star', 'ratings.comment']);
-    queryBuilder.addSelect([
-      'ratingUser.username',
-      'ratingUser.email',
-      'ratingUser.role',
     ]);
     queryBuilder.addSelect([
       'company.title',
@@ -330,6 +310,10 @@ export class PostService {
       relations: { manager: true },
     });
 
+    const findManager = await this.managerRepository.findOne({
+      where: { id: findUser.manager.id },
+    });
+
     const findCategoryAlready = await this.categoryRepository.findOne({
       where: {
         id: createPostDto.type_of_post,
@@ -358,6 +342,10 @@ export class PostService {
 
     if (!createPostDto.require) {
       throw new BadRequestException('Not found require');
+    }
+
+    if (findManager.news === findCompanyAlready.posts.length) {
+      throw new Error('Upgrade to be the best experience.');
     }
 
     const newRequire = this.requireRepository.create({
@@ -583,64 +571,6 @@ export class PostService {
       statusCode: HttpStatus.OK,
       message: 'Delete successfully',
       data: result,
-    };
-  }
-
-  async rating(
-    ratingPostDto: RatingPostDto,
-    user: UserEntity,
-  ): Promise<ApiResponseDto<PostEntity>> {
-    const findUser = await this.userRepository.findOne({
-      where: { id: user.id },
-    });
-
-    if (!ratingPostDto) {
-      throw new BadRequestException('Not found.');
-    }
-
-    const findPost = await this.postRepository.findOne({
-      where: { id: ratingPostDto.postId },
-      relations: { ratings: true },
-    });
-
-    if (!findPost) {
-      throw new NotFoundException('Not found any room.');
-    }
-
-    const ratedStar: RatingEntity = this.ratingRepository.create({
-      ...ratingPostDto,
-      star: ratingPostDto.star,
-      comment: ratingPostDto.comment,
-      post: findPost,
-      userId: findUser,
-    });
-
-    await this.ratingRepository.save(ratedStar);
-
-    // const alreadyRated = findPost.ratings.find(
-    //   (user) => user.userId.id === findUser.id,
-    // );
-
-    findPost.ratings = findPost.ratings
-      ? [...findPost.ratings, ratedStar]
-      : [ratedStar];
-
-    await this.postRepository.save(findPost);
-
-    const totalR = findPost.ratings.length;
-    const ratingSum = findPost.ratings
-      .map((item) => item.star)
-      .reduce((prev, curr) => prev + curr, 0);
-    const actualRating = Math.round(ratingSum / totalR);
-
-    findPost.totalRating = actualRating;
-
-    await this.postRepository.save(findPost);
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Rating successfully',
-      data: findPost,
     };
   }
 

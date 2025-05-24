@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RatingController } from './rating.controller';
 import { RatingService } from './rating.service';
 import { RatingEntity } from './entities/rating.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RatingEntity])],
+  imports: [UserModule, TypeOrmModule.forFeature([RatingEntity])],
   providers: [RatingService],
   controllers: [RatingController],
 })

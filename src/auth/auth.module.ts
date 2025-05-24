@@ -13,6 +13,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { AddressEntity } from 'src/address/entities/address.entity';
 import { ApplicantEntity } from 'src/user/entities/applicant.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ManagerEntity } from 'src/user/entities/manager.entity';
   controllers: [AuthController],
   providers: [
     AuthService,
+    UserService,
     JwtStrategy,
     RefreshTokenService,
     GenerateTokenService,

@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+   app-dev:
+      container_name: job-searching-nestjs-app-dev
+      build:
+        context: .
+        dockerfile: Dockerfile.dev
+      env_file:
+        - .env
+      ports:
+        - '8080:8080'
+      depends_on:
+        - db
+      environment:
+        - DATABASE_HOST=db
+        - DATABASE_PORT=5432
+        - DATABASE_USER=postgres
+        - DATABASE_PASSWORD=sa123
+        - DATABASE_NAME=typeorm-room-manager-db
+      volumes:
+        - .:/app
+        - /app/node_modules
+      profiles:
+        - dev
+   app-prod:
+      container_name: job-searching-nestjs-app-prod
+      build:
+        context: .
+        dockerfile: Dockerfile.prod
+      env_file:
+        - .env
+      ports:
+        - '8080:8080'
+      depends_on:
+        - db
+      profiles:
+        - prod
+   db:
+      image: postgres:13
+      container_name: job-searching-db
+      environment:
+        - DATABASE_USER=postgres
+        - DATABASE_PASSWORD=sa123
+        - DATABASE_NAME=typeorm-room-manager-db
+      ports: 
+        - '5433:5432'
+      volumes:
+        - db-data:/var/lib/postgresql/data
+   pgadmin:
+     image: dpage/pgadmin4
+     container_name: pgadmin4
+     environment:
+        - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+        - PGADMIN_DEFAULT_PASSWORD=sa123
+     ports:
+       - '5050:80'
+     depends_on:
+       - db
+volumes:
+  db-data:
+      

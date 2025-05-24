@@ -12,7 +12,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CategoryEntity } from 'src/category/entities/category.entity';
-import { RatingEntity } from 'src/rating/entities/rating.entity';
 import { RequireEntity } from 'src/requires/entities/require.entity';
 import { ManagerEntity } from 'src/user/entities/manager.entity';
 import { PostStatusType } from 'src/shared/enums/post.enum';
@@ -70,12 +69,6 @@ export class PostEntity {
     default: [PostStatusType.NOT_APPROVED],
   })
   status: PostStatusType[];
-
-  @OneToMany(() => RatingEntity, (rating) => rating.post, {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  ratings: RatingEntity[] | null;
 
   @Column({ type: Number, default: 0, nullable: true })
   totalRating: number;
