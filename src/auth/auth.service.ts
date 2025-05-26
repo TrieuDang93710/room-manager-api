@@ -160,13 +160,16 @@ export class AuthService {
     // const user = await this.usersRepository.findOne({
     //   where: { email: email },
     // });
-    let user: any
-    await this.userService.findUserByEmail(email).then((result) => {
-      user = result.data
-      // console.log('user: ', user);
-    }).catch((error) => {
-      console.log('error: ', error)
-    })
+    let user: any;
+    await this.userService
+      .findUserByEmail(email)
+      .then((result) => {
+        user = result.data;
+        // console.log('user: ', user);
+      })
+      .catch((error) => {
+        console.log('error: ', error);
+      });
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
@@ -369,5 +372,21 @@ export class AuthService {
     } else {
       throw new Error('User id is already existed for this managers.');
     }
+  }
+
+  async sendActivationEmail(user: any): Promise<void> {
+    await this.mailerService.sendMail({
+      to: user.email,
+      from: 'trieu93710@donga.edu.vn',
+      subject: 'Activation account ✔',
+      template: 'register',
+      context: {
+        name: user.username || user.email,
+        activationCode: user.code_id,
+        userId: user.id,
+        uriActivation: `http://localhost:8080/user/`,
+        handleActivate: 'handleActivate',
+      },
+    });
   }
 }

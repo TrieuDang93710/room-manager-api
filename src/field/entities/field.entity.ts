@@ -1,20 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { FieldEntity } from 'src/field/entities/field.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { CategoryEntity } from 'src/category/entities/category.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('categories')
-export class CategoryEntity {
+@Entity('fields')
+export class FieldEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,19 +25,12 @@ export class CategoryEntity {
   @Column()
   description: string;
 
-  @ManyToOne(() => FieldEntity, (field) => field.cates, {
+  @OneToMany(() => CategoryEntity, (cate) => cate.field, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  field: FieldEntity | null;
-
-  @OneToMany(() => PostEntity, (post) => post.type_of_post, {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  posts: PostEntity[];
+  cates: CategoryEntity[];
 
   @CreateDateColumn()
   createAt: Timestamp;

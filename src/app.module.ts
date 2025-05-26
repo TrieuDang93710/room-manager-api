@@ -2,7 +2,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
@@ -29,6 +28,7 @@ import { CompanyModule } from './company/company.module';
 import { ApplyModule } from './apply/apply.module';
 import { ServicePackageModule } from './service_package/service_package.module';
 import { NewsModule } from './news/news.module';
+import { FieldModule } from './field/field.module';
 
 @Module({
   imports: [
@@ -36,7 +36,7 @@ import { NewsModule } from './news/news.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    // MongooseModule.forRoot(process.env.MONGODB_URL),
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
     AuthModule,
@@ -59,6 +59,7 @@ import { NewsModule } from './news/news.module';
     WorkPlaceModule,
     CompanyModule,
     NewsModule,
+    FieldModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
