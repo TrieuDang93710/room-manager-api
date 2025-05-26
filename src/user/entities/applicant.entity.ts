@@ -22,26 +22,14 @@ export class ApplicantEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    default: {},
-    type: 'jsonb',
-    nullable: true,
-  })
-  hobby: object;
+  @Column({ nullable: true })
+  hobby: string;
 
-  @Column({
-    default: {},
-    type: 'jsonb',
-    nullable: true,
-  })
-  skill: object;
+  @Column({ nullable: true })
+  skill: string;
 
-  @Column({
-    default: {},
-    type: 'jsonb',
-    nullable: true,
-  })
-  language: object;
+  @Column({ nullable: true })
+  language: string;
 
   @OneToMany(() => PostEntity, (post) => post.save, {
     nullable: true,

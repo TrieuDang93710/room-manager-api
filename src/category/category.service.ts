@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
 import { ApiResponseDto } from 'src/dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,12 +12,15 @@ import { CategoryEntity } from './entities/category.entity';
 import { Like, Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create.dto';
 import { UpdateCategoryDto } from './dto/update.dto';
+import { FieldEntity } from 'src/field/entities/field.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(FieldEntity)
+    private fieldRepository: Repository<FieldEntity>,
   ) {}
 
   async findAll(query: Query): Promise<ApiResponseDto<any>> {
@@ -29,6 +37,7 @@ export class CategoryService {
     const [result, total] = await this.categoryRepository.findAndCount({
       where: keyword,
       relations: {
+        field: true,
         posts: true,
       },
       select: {
@@ -77,8 +86,36 @@ export class CategoryService {
   async create(
     category: CreateCategoryDto,
   ): Promise<ApiResponseDto<CategoryEntity>> {
-    const data = this.categoryRepository.create(category);
+    const findField = await this.fieldRepository.findOne({
+      where: { id: Number(category.fieldId) },
+    });
+
+    if (!findField) {
+      throw new NotFoundException('Not found');
+    }
+
+    const data = this.categoryRepository.create({
+      title: category.title,
+      description: category.description,
+      slug: category.title.toLocaleLowerCase().replaceAll(' ', '_'),
+      field: findField,
+    });
+
     await this.categoryRepository.save(data);
+
+    if (!findField.cates) {
+      findField.cates = [data];
+    } else {
+      const postAlreadyExisted = findField.cates.some(
+        (postIntiCate) => postIntiCate.id === data.id,
+      );
+      if (!postAlreadyExisted) {
+        findField.cates = [...findField.cates, data];
+      }
+    }
+
+    await this.fieldRepository.save(findField);
+
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Create new category successfully',

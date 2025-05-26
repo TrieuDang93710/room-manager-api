@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsString } from 'class-validator';
 
-export class UpdateCategoryDto {
+export class UpdateFieldDto {
   @IsString()
   readonly title: string;
 

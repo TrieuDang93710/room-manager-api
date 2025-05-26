@@ -82,6 +82,7 @@ export class UserService {
 
     queryBuilder.addSelect([
       // 'user.token',
+      'user.active',
       'address.national',
       'address.city',
       'address.district',
@@ -121,6 +122,7 @@ export class UserService {
     queryBuilder.addSelect([
       'user.token',
       'user.refresh_token',
+      'user.active',
       'address.national',
       'address.city',
       'address.district',

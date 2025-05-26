@@ -79,18 +79,14 @@ export class ResumeEntity {
   expertise: object;
 
   @Column({
-    default: {},
-    type: 'jsonb',
     nullable: true,
   })
-  skills: object;
+  skills: string;
 
   @Column({
-    default: {},
-    type: 'jsonb',
     nullable: true,
   })
-  languages: object;
+  languages: string;
 
   @Column({
     type: 'enum',

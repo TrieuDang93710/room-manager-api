@@ -53,7 +53,7 @@ export class UserEntity {
   })
   account_type: AccountType[];
 
-  @Column({ type: Boolean, default: false, select: false })
+  @Column({ type: Boolean, default: false, select: true })
   active: boolean;
 
   @Column({ nullable: true, select: false })

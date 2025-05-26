@@ -61,6 +61,7 @@ export class ResumeService {
       awards: createResumeDto.awards,
       skills: createResumeDto.skills,
       languages: createResumeDto.languages,
+      expertise: createResumeDto.expertise,
     };
 
     const newResume = this.resumeRepository.create({
