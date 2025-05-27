@@ -61,6 +61,22 @@ export class ServicePackageService {
     };
   }
 
+  async findById(id: number): Promise<ApiResponseDto<any>> {
+    const findOnePackage = await this.servicePackageRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!findOnePackage) {
+      throw new NotFoundException('Not found service package by id');
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get one service package successfully',
+      data: findOnePackage,
+    };
+  }
+
   async remove(id: number): Promise<ApiResponseDto<any>> {
     const findNews = await this.servicePackageRepository.findOne({
       where: { id: id },

@@ -77,7 +77,7 @@ export class ResumeService {
       const contractAlreadyExisted = findApplicant.resumes.some(
         (ct) => ct.id === newResume.id,
       );
-      if (!contractAlreadyExisted) {
+      if (contractAlreadyExisted === false) {
         findApplicant.resumes = [...findApplicant.resumes, newResume];
       }
     }

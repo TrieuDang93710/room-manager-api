@@ -43,6 +43,8 @@ export class UserService {
         manager: {
           packages: true,
           posts: true,
+          account_pay: true,
+          company: true,
         },
         senderMessages: true,
         receiverMessages: true,
@@ -78,7 +80,9 @@ export class UserService {
       .leftJoin('user.receiverMessages', 'receiverMessages')
       .leftJoin('user.senderMessages', 'senderMessages')
       .leftJoin('user.applicant', 'applicant')
-      .leftJoin('user.manager', 'manager');
+      .leftJoin('user.manager', 'manager')
+      .leftJoin('manager.packages', 'packages')
+      .leftJoin('manager.posts', 'posts');
 
     queryBuilder.addSelect([
       // 'user.token',
@@ -97,6 +101,13 @@ export class UserService {
       'applicant.hobby',
       'applicant.language',
       'applicant.skill',
+      'manager.news',
+      'packages.description',
+      'packages.price',
+      'packages.news_quantity',
+      'posts.title',
+      'posts.status',
+      'posts.duration',
     ]);
 
     queryBuilder.where('user.id = :id', { id: id });

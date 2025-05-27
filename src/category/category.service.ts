@@ -107,7 +107,7 @@ export class CategoryService {
       findField.cates = [data];
     } else {
       const postAlreadyExisted = findField.cates.some(
-        (postIntiCate) => postIntiCate.id === data.id,
+        (postIntiCate) => postIntiCate.title === data.title,
       );
       if (!postAlreadyExisted) {
         findField.cates = [...findField.cates, data];
