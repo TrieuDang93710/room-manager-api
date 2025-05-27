@@ -89,23 +89,40 @@ export class PaymentService {
 
     const findManager = await this.managerRepository.findOne({
       where: { id: manager.id },
-      relations: { account_pay: true },
+      relations: { account_pay: true, packages: true },
     });
+
+    const packageExisted = findManager.packages.some(
+      (pay) => pay.id === findServicePackage.id,
+    );
+
+    if (newPayment && packageExisted === false) {
+      findManager.news = findManager.news + findServicePackage.news_quantity;
+    }
 
     if (!findManager.account_pay) {
       findManager.account_pay = [newPayment];
-      findManager.packages = [findServicePackage];
-      findManager.news = findManager.news + findServicePackage.news_quantity
     } else {
       const paymentAlreadyExisted = findManager.account_pay.some(
         (pay) => pay.id === newPayment.id,
       );
-      if (!paymentAlreadyExisted) {
+      if (paymentAlreadyExisted === false) {
         findManager.account_pay = [...findManager.account_pay, newPayment];
-        findManager.packages = [...findManager.packages, findServicePackage];
-        findManager.news = findManager.news + findServicePackage.news_quantity
       }
     }
+
+    if (!findManager.packages) {
+      findManager.packages = [findServicePackage];
+    } else {
+      const packageAlreadyExisted = findManager.packages.some(
+        (pay) => pay.id === findServicePackage.id,
+      );
+      if (packageAlreadyExisted === false) {
+        findManager.packages = [...findManager.packages, findServicePackage];
+      }
+    }
+
+    await this.managerRepository.save(findManager);
 
     if (!findServicePackage.payments) {
       findServicePackage.payments = [newPayment];
@@ -145,9 +162,7 @@ export class PaymentService {
 
   async findByEmail(email: string): Promise<ApiResponseDto<PaymentEntity[]>> {
     const data = await this.paymentRepository.find();
-    const filter = data.filter(
-      (item: any) => item.email === email,
-    );
+    const filter = data.filter((item: any) => item.email === email);
     return {
       statusCode: HttpStatus.OK,
       message: 'Get a payment by email successfully',

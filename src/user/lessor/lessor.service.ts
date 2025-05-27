@@ -18,6 +18,7 @@ export class LessorService {
         user: true,
         posts: true,
         packages: true,
+        account_pay: true
       },
       select: {
         user: {

@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Query as ExpressQuery } from 'express-serve-static-core'; 
+import { Query as ExpressQuery } from 'express-serve-static-core';
 import { ServicePackageService } from './service_package.service';
 import { Roles } from 'src/user/decorators/role.decorator';
 import { AuthGuard } from '@nestjs/passport';
@@ -37,6 +37,16 @@ export class ServicePackageController {
     newDto: CreateDto,
   ) {
     return this.servicePackageService.create(newDto);
+  }
+
+  @Get('/:id')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.APPLICANT)
+  @UseGuards(AuthGuard(), RolesGuard)
+  async getById(
+    @Param('id')
+    id: number,
+  ) {
+    return this.servicePackageService.findById(id);
   }
 
   @Patch('/remove/:id')

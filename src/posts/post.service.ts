@@ -359,6 +359,7 @@ export class PostService {
       quantity: createPostDto.require.quantity,
       description: createPostDto.require.detail,
     });
+
     await this.requireRepository.save(newRequire);
 
     const findCreateByUser = await this.managerRepository.findOne({
@@ -369,6 +370,16 @@ export class PostService {
         posts: true,
       },
     });
+
+    const posts = await this.postRepository.find();
+
+    const postTitleExisted = posts.some(
+      (postIntiCate) => postIntiCate.title === createPostDto.title,
+    );
+
+    if (postTitleExisted) {
+      throw new Error('The title is already existed, please enter other title');
+    }
 
     const newPost = this.postRepository.create({
       title: createPostDto.title,
@@ -381,15 +392,16 @@ export class PostService {
       duration: createPostDto.duration,
       createBy: findCreateByUser,
     });
+
     await this.postRepository.save(newPost);
 
     if (!findCategoryAlready.posts) {
       findCategoryAlready.posts = [newPost];
     } else {
       const postAlreadyExisted = findCategoryAlready.posts.some(
-        (postIntiCate) => postIntiCate.id === newPost.id,
+        (postIntiCate) => postIntiCate.title === newPost.title,
       );
-      if (!postAlreadyExisted) {
+      if (postAlreadyExisted === false) {
         findCategoryAlready.posts = [...findCategoryAlready.posts, newPost];
       }
     }
@@ -400,9 +412,9 @@ export class PostService {
       findCompanyAlready.posts = [newPost];
     } else {
       const postAlreadyExisted = findCompanyAlready.posts.some(
-        (postIntiCate) => postIntiCate.id === newPost.id,
+        (postIntiCate) => postIntiCate.title === newPost.title,
       );
-      if (!postAlreadyExisted) {
+      if (postAlreadyExisted === false) {
         findCompanyAlready.posts = [...findCompanyAlready.posts, newPost];
       }
     }
@@ -411,9 +423,9 @@ export class PostService {
       findCreateByUser.posts = [newPost];
     } else {
       const userAlreadyExisted = findCreateByUser.posts.some(
-        (postIntoUser) => postIntoUser.id === newPost.id,
+        (postIntoUser) => postIntoUser.title === newPost.title,
       );
-      if (!userAlreadyExisted) {
+      if (userAlreadyExisted === false) {
         findCreateByUser.posts = [...findCreateByUser.posts, newPost];
       }
     }
