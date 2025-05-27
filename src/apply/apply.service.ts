@@ -71,7 +71,7 @@ export class ApplyService {
       const applyAlreadyExisted = findPost.applies.some(
         (ct) => ct.id === newApply.id,
       );
-      if (!applyAlreadyExisted) {
+      if (applyAlreadyExisted === false) {
         findPost.applies = [...findPost.applies, newApply];
       }
     }
@@ -82,7 +82,7 @@ export class ApplyService {
       const applyAlreadyExisted = findResume.applies.some(
         (ct) => ct.id === newApply.id,
       );
-      if (!applyAlreadyExisted) {
+      if (applyAlreadyExisted === false) {
         findResume.applies = [...findResume.applies, newApply];
       }
     }
@@ -93,7 +93,7 @@ export class ApplyService {
       const applyAlreadyExisted = findApplicant.applies.some(
         (ct) => ct.id === newApply.id,
       );
-      if (!applyAlreadyExisted) {
+      if (applyAlreadyExisted === false) {
         findApplicant.applies = [...findApplicant.applies, newApply];
       }
     }
