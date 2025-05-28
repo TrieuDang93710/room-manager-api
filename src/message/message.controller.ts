@@ -9,10 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
-import { Roles } from 'src/user/decorators/role.decorator';
-import { Role } from 'src/shared/enums/role.enum';
+import { Roles } from '../user/decorators/role.decorator';
+import { Role } from '../shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/user/guards/role.guard';
+import { RolesGuard } from '../user/guards/role.guard';
 import { SendDto } from './dto/send.dto';
 
 @Controller('message')

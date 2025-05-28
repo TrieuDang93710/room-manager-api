@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { PaymentEntity } from 'src/payment/entities/payment.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { PaymentEntity } from '../../payment/entities/payment.entity';
+import { ManagerEntity } from '../../user/entities/manager.entity';
 import {
   Column,
   CreateDateColumn,

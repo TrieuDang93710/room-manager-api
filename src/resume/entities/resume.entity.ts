@@ -10,9 +10,9 @@ import {
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { ResumeStatusType } from 'src/shared/enums/resume.enum';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { ApplicantEntity } from '../../user/entities/applicant.entity';
+import { ResumeStatusType } from '../../shared/enums/resume.enum';
+import { ApplyEntity } from '../../apply/entities/apply.entity';
 
 @Entity('resumes')
 export class ResumeEntity {

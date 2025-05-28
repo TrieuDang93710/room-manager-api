@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RatingController } from './rating.controller';
 import { RatingService } from './rating.service';
 import { RatingEntity } from './entities/rating.entity';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [UserModule, TypeOrmModule.forFeature([RatingEntity])],

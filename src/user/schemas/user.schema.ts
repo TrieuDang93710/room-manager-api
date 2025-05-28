@@ -3,7 +3,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Role } from '../../shared/enums/role.enum';
-import { AccountType } from 'src/shared/enums/account-type.enum';
+import { AccountType } from '../../shared/enums/account-type.enum';
 
 @Schema({
   timestamps: true,

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../../dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagerEntity } from '../entities/manager.entity';
 import { Repository } from 'typeorm';

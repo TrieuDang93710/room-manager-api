@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { NewsEntity } from './entities/news.entity';
 import { Repository } from 'typeorm';
 import { Query } from 'express-serve-static-core';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 
 @Injectable()
 export class NewsService {

@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ServicePackageEntity } from './entities/service_package.entity';
 import { Repository } from 'typeorm';
 import { Query } from 'express-serve-static-core';
-import { PaymentEntity } from 'src/payment/entities/payment.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { PaymentEntity } from '../payment/entities/payment.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { ApiResponseDto } from '../dto/response.dto';
 
 @Injectable()
 export class ServicePackageService {

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { UserEntity } from 'src/user/entities/user.entity';
-import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
+import { UserEntity } from '../../user/entities/user.entity';
+import { WorkPlaceEntity } from '../../work_place/entities/work-place.entity';
 import {
   Column,
   CreateDateColumn,

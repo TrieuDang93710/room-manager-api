@@ -3,8 +3,8 @@ import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageEntity } from './entities/message.entity';
 import { Repository } from 'typeorm';
-import { ApiResponseDto } from 'src/dto/response.dto';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { ApiResponseDto } from '../dto/response.dto';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Injectable()
 export class MessageService {

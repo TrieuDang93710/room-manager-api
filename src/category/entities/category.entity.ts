@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { FieldEntity } from 'src/field/entities/field.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { FieldEntity } from '../../field/entities/field.entity';
+import { PostEntity } from '../../posts/entities/post.entity';
 import {
   Column,
   CreateDateColumn,

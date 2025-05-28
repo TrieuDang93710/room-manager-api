@@ -5,14 +5,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiResponseDto } from 'src/dto/response.dto';
-import { Role } from 'src/shared/enums/role.enum';
+import { ApiResponseDto } from '../dto/response.dto';
+import { Role } from '../shared/enums/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { ApplicantEntity } from './entities/applicant.entity';
 import { ManagerEntity } from './entities/manager.entity';
-import { AddressEntity } from 'src/address/entities/address.entity';
+import { AddressEntity } from '../address/entities/address.entity';
 
 @Injectable()
 export class UserService {

@@ -5,15 +5,15 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtStrategy } from 'src/user/jwt.strategy';
-import { RefreshTokenService } from 'src/helpers/refreshToken';
-import { GenerateTokenService } from 'src/helpers/token';
+import { JwtStrategy } from '../user/jwt.strategy';
+import { RefreshTokenService } from '../helpers/refreshToken';
+import { GenerateTokenService } from '../helpers/token';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { UserService } from 'src/user/user.service';
+import { UserEntity } from '../user/entities/user.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { UserService } from '../user/user.service';
 
 @Module({
   imports: [

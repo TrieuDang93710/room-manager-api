@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Role } from 'src/shared/enums/role.enum';
+import { Role } from '../../shared/enums/role.enum';
 export class SignUpDto {
   @IsNotEmpty()
   @IsString({ message: 'number of letter is not less 3 letter' })

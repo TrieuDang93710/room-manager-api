@@ -2,19 +2,19 @@
 import { Module } from '@nestjs/common';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { CategoryEntity } from 'src/category/entities/category.entity';
-import { RequireEntity } from 'src/requires/entities/require.entity';
-import { RatingEntity } from 'src/rating/entities/rating.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { CategoryEntity } from '../category/entities/category.entity';
+import { RequireEntity } from '../requires/entities/require.entity';
+import { RatingEntity } from '../rating/entities/rating.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
+import { WorkPlaceEntity } from '../work_place/entities/work-place.entity';
+import { CompanyEntity } from '../company/entities/company.entity';
+import { ApplyEntity } from '../apply/entities/apply.entity';
+import { ResumeEntity } from '../resume/entities/resume.entity';
 
 @Module({
   imports: [

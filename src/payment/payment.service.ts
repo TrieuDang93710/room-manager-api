@@ -5,14 +5,14 @@ import {
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentEntity } from './entities/payment.entity';
 import { Repository } from 'typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { Role } from 'src/shared/enums/role.enum';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { Role } from '../shared/enums/role.enum';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { ServicePackageEntity } from '../service_package/entities/service_package.entity';
 import { Stripe } from 'stripe';
 
 @Injectable()

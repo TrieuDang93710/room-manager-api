@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 import toStream from 'buffer-to-stream';
-import cloudinary from 'src/cloudinary.config';
+import cloudinary from '../cloudinary.config';
 
 @Injectable()
 export class CloudinaryService {

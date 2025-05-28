@@ -2,9 +2,9 @@
 import { Module } from '@nestjs/common';
 import { WorkPlaceService } from './work_place.service';
 import { WorkPlaceController } from './work_place.controller';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { PostEntity } from '../posts/entities/post.entity';
 import { WorkPlaceEntity } from './entities/work-place.entity';
-import { AddressEntity } from 'src/address/entities/address.entity';
+import { AddressEntity } from '../address/entities/address.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

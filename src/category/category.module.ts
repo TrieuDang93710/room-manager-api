@@ -4,7 +4,7 @@ import { CategoryService } from './category.service';
 import { CategoryController } from './category.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
-import { FieldEntity } from 'src/field/entities/field.entity';
+import { FieldEntity } from '../field/entities/field.entity';
 
 @Module({
   imports: [

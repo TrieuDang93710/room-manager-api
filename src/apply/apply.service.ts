@@ -8,11 +8,11 @@ import { Query } from 'express-serve-static-core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { ApplyEntity } from './entities/apply.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { ApiResponseDto } from 'src/dto/response.dto';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+import { ResumeEntity } from '../resume/entities/resume.entity';
+import { PostEntity } from '../posts/entities/post.entity';
+import { ApiResponseDto } from '../dto/response.dto';
+import { UserEntity } from '../user/entities/user.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
 
 @Injectable()
 export class ApplyService {

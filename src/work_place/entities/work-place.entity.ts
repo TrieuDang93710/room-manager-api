@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
+import { AddressEntity } from '../../address/entities/address.entity';
+import { CompanyEntity } from '../../company/entities/company.entity';
 import {
   Column,
   CreateDateColumn,

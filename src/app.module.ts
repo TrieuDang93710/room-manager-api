@@ -17,7 +17,7 @@ import { ResumeModule } from './resume/resume.module';
 import { RequireModule } from './requires/require.module';
 import { MailModule } from './mail/mailer.module';
 import { AuthModule } from './auth/auth.module';
-import { dataSourceOptions } from 'db/data-source';
+import { dataSourceOptions } from '../db/data-source';
 import { RatingModule } from './rating/rating.module';
 import { MessageModule } from './message/message.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
@@ -78,7 +78,7 @@ import { FieldModule } from './field/field.module';
         },
         preview: true,
         template: {
-          dir: process.cwd() + '/src/mail/templates/',
+          dir: process.cwd() + '/../mail/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
           options: {
             strict: true,

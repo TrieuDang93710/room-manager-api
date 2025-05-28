@@ -3,7 +3,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WorkPlaceEntity } from './entities/work-place.entity';
 import { Repository } from 'typeorm';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 
 @Injectable()
 export class WorkPlaceService {

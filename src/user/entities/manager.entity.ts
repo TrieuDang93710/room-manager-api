@@ -11,10 +11,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
-import { PaymentEntity } from 'src/payment/entities/payment.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
+import { PostEntity } from '../../posts/entities/post.entity';
+import { ServicePackageEntity } from '../../service_package/entities/service_package.entity';
+import { PaymentEntity } from '../../payment/entities/payment.entity';
+import { CompanyEntity } from '../../company/entities/company.entity';
 
 @Entity('managers')
 export class ManagerEntity {
