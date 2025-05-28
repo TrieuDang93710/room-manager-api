@@ -17,7 +17,9 @@ FROM node:18 AS production
 
 WORKDIR /app
 
-# COPY package.json package-lock.json ./
+# Copy package.json và node_modules nếu cần
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules ./node_modules
 
 COPY --from=build /app/dist ./dist
 
