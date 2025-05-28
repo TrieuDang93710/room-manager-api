@@ -12,12 +12,6 @@ services:
         - '8080:8080'
       depends_on:
         - db
-      # environment:
-      #   - DATABASE_HOST=db
-      #   - DATABASE_PORT=5432
-      #   - DATABASE_USER=postgres
-      #   - DATABASE_PASSWORD=sa123
-      #   - DATABASE_NAME=typeorm-room-manager-db
       volumes:
         - .:/app
         - /app/node_modules
@@ -29,11 +23,9 @@ services:
         context: .
         dockerfile: Dockerfile.prod
       env_file:
-        - .env
+        - .env.prod
       ports:
         - '8080:8080'
-      depends_on:
-        - db
       profiles:
         - prod
    db:

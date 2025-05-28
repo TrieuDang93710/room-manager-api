@@ -33,7 +33,7 @@ import { FieldModule } from './field/field.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: ['.env', '.env.prod'],
       isGlobal: true,
     }),
     // MongooseModule.forRoot(process.env.MONGODB_URL),
