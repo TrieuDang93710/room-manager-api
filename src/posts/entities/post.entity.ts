@@ -11,14 +11,14 @@ import {
   Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
-import { CategoryEntity } from 'src/category/entities/category.entity';
-import { RequireEntity } from 'src/requires/entities/require.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { PostStatusType } from 'src/shared/enums/post.enum';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { WorkType } from 'src/shared/enums/work.enum';
-import { CompanyEntity } from 'src/company/entities/company.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
+import { CategoryEntity } from '../../category/entities/category.entity';
+import { RequireEntity } from '../../requires/entities/require.entity';
+import { ManagerEntity } from '../../user/entities/manager.entity';
+import { PostStatusType } from '../../shared/enums/post.enum';
+import { ApplicantEntity } from '../../user/entities/applicant.entity';
+import { WorkType } from '../../shared/enums/work.enum';
+import { CompanyEntity } from '../../company/entities/company.entity';
+import { ApplyEntity } from '../../apply/entities/apply.entity';
 
 @Entity('posts')
 export class PostEntity {

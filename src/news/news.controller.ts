@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { NewsService } from './news.service';
-import { Roles } from 'src/user/decorators/role.decorator';
+import { Roles } from '../user/decorators/role.decorator';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/user/guards/role.guard';
-import { Role } from 'src/shared/enums/role.enum';
+import { RolesGuard } from '../user/guards/role.guard';
+import { Role } from '../shared/enums/role.enum';
 import { CreateNewsDto } from './dto/create.dto';
 
 @Controller('news')

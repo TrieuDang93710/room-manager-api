@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { AccountType } from 'src/shared/enums/account-type.enum';
-import { Role } from 'src/shared/enums/role.enum';
+import { AddressEntity } from '../../address/entities/address.entity';
+import { AccountType } from '../../shared/enums/account-type.enum';
+import { Role } from '../../shared/enums/role.enum';
 import {
   Column,
   CreateDateColumn,
@@ -15,9 +15,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ManagerEntity } from './manager.entity';
-import { MessageEntity } from 'src/message/entities/message.entity';
+import { MessageEntity } from '../../message/entities/message.entity';
 import { ApplicantEntity } from './applicant.entity';
-import { GenderType } from 'src/shared/enums/gender.enum';
+import { GenderType } from '../../shared/enums/gender.enum';
 
 @Entity('users')
 export class UserEntity {

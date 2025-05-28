@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { PostEntity } from '../../posts/entities/post.entity';
 import {
   Column,
   CreateDateColumn,
@@ -12,10 +12,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { SalaryEntity } from 'src/salary/entities/salary.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
+import { SalaryEntity } from '../../salary/entities/salary.entity';
+import { ResumeEntity } from '../../resume/entities/resume.entity';
+import { ApplyEntity } from '../../apply/entities/apply.entity';
+import { CompanyEntity } from '../../company/entities/company.entity';
 
 @Entity('applicants')
 export class ApplicantEntity {

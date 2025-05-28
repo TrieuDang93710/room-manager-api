@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { GenderType } from 'src/shared/enums/gender.enum';
+import { PostEntity } from '../../posts/entities/post.entity';
+import { GenderType } from '../../shared/enums/gender.enum';
 import {
   Column,
   CreateDateColumn,

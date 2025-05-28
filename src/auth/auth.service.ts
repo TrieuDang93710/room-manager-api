@@ -6,24 +6,24 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 import * as bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
-import { GenerateTokenService } from 'src/helpers/token';
-import { RefreshTokenService } from 'src/helpers/refreshToken';
+import { GenerateTokenService } from '../helpers/token';
+import { RefreshTokenService } from '../helpers/refreshToken';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ForgotPasswordDto } from 'src/user/dto/forgot.dto';
+import { ForgotPasswordDto } from '../user/dto/forgot.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
-import { SignInDto } from 'src/user/dto/signin.dto';
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { TimestampConvert } from 'src/helpers/convert';
-import { UserService } from 'src/user/user.service';
+import { SignInDto } from '../user/dto/signin.dto';
+import { AddressEntity } from '../address/entities/address.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { TimestampConvert } from '../helpers/convert';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {

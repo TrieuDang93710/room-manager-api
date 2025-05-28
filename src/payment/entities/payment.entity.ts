@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { ServicePackageEntity } from 'src/service_package/entities/service_package.entity';
-import { PaymentMethod, PaymentStatus } from 'src/shared/enums/payment.enum';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { ServicePackageEntity } from '../../service_package/entities/service_package.entity';
+import { PaymentMethod, PaymentStatus } from '../../shared/enums/payment.enum';
+import { ManagerEntity } from '../../user/entities/manager.entity';
 import {
   Column,
   CreateDateColumn,

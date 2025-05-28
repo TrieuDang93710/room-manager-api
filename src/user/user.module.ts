@@ -6,18 +6,18 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { RefreshTokenService } from 'src/helpers/refreshToken';
-import { GenerateTokenService } from 'src/helpers/token';
+import { RefreshTokenService } from '../helpers/refreshToken';
+import { GenerateTokenService } from '../helpers/token';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ApplicantEntity } from './entities/applicant.entity';
 import { ManagerEntity } from './entities/manager.entity';
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { RequireEntity } from 'src/requires/entities/require.entity';
-import { PaymentEntity } from 'src/payment/entities/payment.entity';
-import { ApplyEntity } from 'src/apply/entities/apply.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { PostEntity } from '../posts/entities/post.entity';
+import { RequireEntity } from '../requires/entities/require.entity';
+import { PaymentEntity } from '../payment/entities/payment.entity';
+import { ApplyEntity } from '../apply/entities/apply.entity';
+import { ResumeEntity } from '../resume/entities/resume.entity';
 
 @Module({
   imports: [

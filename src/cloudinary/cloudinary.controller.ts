@@ -8,8 +8,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import cloudinary from 'src/cloudinary.config';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import cloudinary from '../cloudinary.config';
+import { ApiResponseDto } from '../dto/response.dto';
 import { CloudinaryService } from './cloudinary.service';
 
 @Controller('cloudinary')

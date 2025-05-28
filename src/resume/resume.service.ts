@@ -6,13 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 import { ResumeEntity } from './entities/resume.entity';
 import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { PostEntity } from '../posts/entities/post.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
 
 @Injectable()
 export class ResumeService {

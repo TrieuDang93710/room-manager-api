@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { RequireService } from './require.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/user/guards/role.guard';
-import { Roles } from 'src/user/decorators/role.decorator';
-import { Role } from 'src/shared/enums/role.enum';
+import { RolesGuard } from '../user/guards/role.guard';
+import { Roles } from '../user/decorators/role.decorator';
+import { Role } from '../shared/enums/role.enum';
 import { CreateRequirementDto } from './dto/create.dto';
 
 @Controller('require')

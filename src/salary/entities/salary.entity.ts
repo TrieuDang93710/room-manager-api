@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+import { ApplicantEntity } from '../../user/entities/applicant.entity';
 import {
   Column,
   CreateDateColumn,

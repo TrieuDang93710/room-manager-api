@@ -13,9 +13,9 @@ import {
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/user/guards/role.guard';
-import { Roles } from 'src/user/decorators/role.decorator';
-import { Role } from 'src/shared/enums/role.enum';
+import { RolesGuard } from '../user/guards/role.guard';
+import { Roles } from '../user/decorators/role.decorator';
+import { Role } from '../shared/enums/role.enum';
 @Controller('payment')
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}

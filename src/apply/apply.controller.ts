@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { ApplyService } from './apply.service';
-import { Roles } from 'src/user/decorators/role.decorator';
-import { Role } from 'src/shared/enums/role.enum';
+import { Roles } from '../user/decorators/role.decorator';
+import { Role } from '../shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/user/guards/role.guard';
+import { RolesGuard } from '../user/guards/role.guard';
 import { CreateApplyDto } from './dto/create.dto';
 import { StatusDto } from './dto/status.gto';
 

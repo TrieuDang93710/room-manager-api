@@ -9,12 +9,12 @@ import { Query } from 'express-serve-static-core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyEntity } from './entities/company.entity';
 import { Brackets, Repository } from 'typeorm';
-import { ApiResponseDto } from 'src/dto/response.dto';
-import { WorkPlaceEntity } from 'src/work_place/entities/work-place.entity';
-import { AddressEntity } from 'src/address/entities/address.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
+import { ApiResponseDto } from '../dto/response.dto';
+import { WorkPlaceEntity } from '../work_place/entities/work-place.entity';
+import { AddressEntity } from '../address/entities/address.entity';
+import { PostEntity } from '../posts/entities/post.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
 
 @Injectable()
 export class CompanyService {

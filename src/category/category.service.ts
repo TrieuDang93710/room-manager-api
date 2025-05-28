@@ -6,13 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
 import { Like, Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create.dto';
 import { UpdateCategoryDto } from './dto/update.dto';
-import { FieldEntity } from 'src/field/entities/field.entity';
+import { FieldEntity } from '../field/entities/field.entity';
 
 @Injectable()
 export class CategoryService {

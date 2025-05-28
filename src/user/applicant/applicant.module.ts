@@ -8,9 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { ApplicantEntity } from '../entities/applicant.entity';
 import { ManagerEntity } from '../entities/manager.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { ResumeEntity } from '../../resume/entities/resume.entity';
+import { CompanyEntity } from '../../company/entities/company.entity';
+import { PostEntity } from '../../posts/entities/post.entity';
 
 @Module({
   imports: [

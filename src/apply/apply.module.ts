@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { PostEntity } from '../posts/entities/post.entity';
 import { ApplyController } from './apply.controller';
 import { ApplyService } from './apply.service';
 import { ApplyEntity } from './entities/apply.entity';
-import { ResumeEntity } from 'src/resume/entities/resume.entity';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
+import { ResumeEntity } from '../resume/entities/resume.entity';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
 
 @Module({
   imports: [

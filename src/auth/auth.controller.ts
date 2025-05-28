@@ -7,10 +7,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Roles } from 'src/user/decorators/role.decorator';
-import { Role } from 'src/shared/enums/role.enum';
-import { ForgotPasswordDto } from 'src/user/dto/forgot.dto';
-import { SignInDto } from 'src/user/dto/signin.dto';
+import { Roles } from '../user/decorators/role.decorator';
+import { Role } from '../shared/enums/role.enum';
+import { ForgotPasswordDto } from '../user/dto/forgot.dto';
+import { SignInDto } from '../user/dto/signin.dto';
 
 @Controller('auth')
 export class AuthController {

@@ -7,17 +7,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Query } from 'express-serve-static-core';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
 import { Brackets, Repository } from 'typeorm';
-import { CategoryEntity } from 'src/category/entities/category.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { ManagerEntity } from 'src/user/entities/manager.entity';
-import { Role } from 'src/shared/enums/role.enum';
-import { ApplicantEntity } from 'src/user/entities/applicant.entity';
-import { CompanyEntity } from 'src/company/entities/company.entity';
-import { RequireEntity } from 'src/requires/entities/require.entity';
+import { CategoryEntity } from '../category/entities/category.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { ManagerEntity } from '../user/entities/manager.entity';
+import { Role } from '../shared/enums/role.enum';
+import { ApplicantEntity } from '../user/entities/applicant.entity';
+import { CompanyEntity } from '../company/entities/company.entity';
+import { RequireEntity } from '../requires/entities/require.entity';
 
 @Injectable()
 export class PostService {

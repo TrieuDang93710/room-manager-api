@@ -3,9 +3,9 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RequireEntity } from './entities/require.entity';
 import { Repository } from 'typeorm';
-import { PostEntity } from 'src/posts/entities/post.entity';
+import { PostEntity } from '../posts/entities/post.entity';
 import { CreateRequirementDto } from './dto/create.dto';
-import { ApiResponseDto } from 'src/dto/response.dto';
+import { ApiResponseDto } from '../dto/response.dto';
 
 @Injectable()
 export class RequireService {
