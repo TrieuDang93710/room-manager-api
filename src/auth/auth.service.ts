@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponseDto } from '../dto/response.dto';
 import * as bcrypt from 'bcrypt';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { GenerateTokenService } from '../helpers/token';
@@ -53,7 +53,7 @@ export class AuthService {
     const salt = 10;
     const hashPassword = await bcrypt.hash(password, salt);
     const codeId = uuidv4();
-    const date = dayjs();
+    // const date = dayjs();
 
     // Kiểm tra người dùng đã tồn tại hay chưa
     const existedUser = await this.usersRepository.findOneBy({ email: email });
@@ -78,10 +78,10 @@ export class AuthService {
       email,
       address: newAddress,
       code_id: codeId,
-      code_expired: date.add(5, 'minutes'),
+      code_expired: dayjs().add(5, 'minutes'),
     };
 
-    if (!role) {
+    if (!role || role[0] === 'applicant') {
       const newApplicant = this.applicantRepository.create(null);
       await this.applicantRepository.save(newApplicant);
       newUserData.applicant = newApplicant;

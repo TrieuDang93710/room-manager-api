@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
-import toStream from 'buffer-to-stream';
+import * as toStream from 'buffer-to-stream';
 import cloudinary from '../cloudinary.config';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CloudinaryService {
         },
       );
       console.log('file: ', file);
-      if (!file.buffer || !Buffer.isBuffer(file.buffer)) {
+      if (!file || !file.buffer || !Buffer.isBuffer(file.buffer)) {
         return reject(new Error('file is not a valid buffer'));
       }
       const stream = toStream(file.buffer);
