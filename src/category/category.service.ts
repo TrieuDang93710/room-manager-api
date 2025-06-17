@@ -88,6 +88,7 @@ export class CategoryService {
   ): Promise<ApiResponseDto<CategoryEntity>> {
     const findField = await this.fieldRepository.findOne({
       where: { id: Number(category.fieldId) },
+      relations: { cates: true },
     });
 
     if (!findField) {

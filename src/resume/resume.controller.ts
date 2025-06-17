@@ -43,6 +43,14 @@ export class ResumeController {
     return this.resumeService.findAll(query);
   }
 
+  @Get('/get-by-email')
+  async getResumeByEmail(
+    @Query()
+    query: ExpressQuery,
+  ) {
+    return this.resumeService.findAllByEmail(query);
+  }
+
   @Get('/get-one/:id')
   @Roles(Role.ADMIN, Role.MANAGER, Role.USER, Role.APPLICANT)
   @UseGuards(AuthGuard(), RolesGuard)

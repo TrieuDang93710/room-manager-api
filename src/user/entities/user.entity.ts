@@ -50,6 +50,7 @@ export class UserEntity {
     enum: AccountType,
     array: true,
     default: [AccountType.LOCAL],
+    nullable: true,
   })
   account_type: AccountType[];
 
