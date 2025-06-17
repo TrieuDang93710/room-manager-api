@@ -78,7 +78,7 @@ import { FieldModule } from './field/field.module';
         },
         preview: true,
         template: {
-          dir: process.cwd() + '/../mail/templates/',
+          dir: process.cwd() + '/src/dto/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
           options: {
             strict: true,

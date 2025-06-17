@@ -256,6 +256,57 @@ export class ResumeService {
     };
   }
 
+  async findAllByEmail(query: Query): Promise<ApiResponseDto<any>> {
+    const resPerPage = Number(query.pageSize) || 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = resPerPage * (currentPage - 1);
+
+    const queryBuilder = this.resumeRepository
+      .createQueryBuilder('resume')
+      .leftJoin('resume.applies', 'applies')
+      .leftJoin('resume.applicant', 'applicant')
+      .leftJoin('applicant.user', 'user')
+      .leftJoin('user.address', 'address');
+
+    queryBuilder.addSelect([
+      'applies.id',
+      'applies.letter',
+      'applies.status',
+      'applies.description',
+      'applicant.id',
+      'user.username',
+      'user.email',
+      'user.role',
+      'user.date_of_birth',
+      'user.gender',
+      'address.national',
+      'address.district',
+      'address.city',
+      'address.village',
+    ]);
+    // pagination
+    queryBuilder.take(resPerPage).skip(skip);
+
+    const [result] = await queryBuilder.getManyAndCount();
+
+    const resultFilter = result.filter(
+      (resume) => resume.applicant.user.email === query.email,
+    );
+
+    const totalPages = Math.ceil(resultFilter.length / resPerPage);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get all resume by email successfully',
+      data: {
+        result: resultFilter,
+        totalItems: resultFilter.length,
+        totalPages: totalPages,
+        currentPage: currentPage,
+      },
+    };
+  }
+
   async findById(id: number): Promise<ApiResponseDto<any>> {
     const queryBuilder = this.resumeRepository
       .createQueryBuilder('resume')

@@ -48,10 +48,24 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: any): Promise<ApiResponseDto<any>> {
-    const { username, password, email, address, role } = signUpDto;
+    const { username, password, email, address, role, account_type } =
+      signUpDto;
+
+    const passwordDefault = '123456';
+
+    let hashPassword: string;
 
     const salt = 10;
-    const hashPassword = await bcrypt.hash(password, salt);
+    if (
+      account_type &&
+      account_type.length > 0 &&
+      account_type[0] === 'google'
+    ) {
+      hashPassword = await bcrypt.hash(passwordDefault, salt);
+    } else {
+      hashPassword = await bcrypt.hash(password, salt);
+    }
+    // const hashPassword = await bcrypt.hash(password, salt);
     const codeId = uuidv4();
     // const date = dayjs();
 
@@ -76,6 +90,7 @@ export class AuthService {
       username,
       password: hashPassword,
       email,
+      account_type,
       address: newAddress,
       code_id: codeId,
       code_expired: dayjs().add(5, 'minutes'),
@@ -117,12 +132,25 @@ export class AuthService {
     });
 
     console.log('token: ', token);
-    // await this.sendActivationEmail(newUser);
+    await this.sendActivationEmail(newUser)
+      .then(() => {
+        console.log('Activation email sent successfully');
+      })
+      .catch(() => {});
 
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Sign up successful',
-      data: { token, user },
+      data: {
+        token,
+        user,
+        message: 'Please check your email to activate your account.',
+        account_type: user.account_type,
+        passwordDefault:
+          account_type && account_type[0] === 'google'
+            ? passwordDefault
+            : password, // Return default password if account_type is google
+      },
     };
   }
 
