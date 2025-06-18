@@ -217,6 +217,105 @@ export class PostService {
     };
   }
 
+  async findAllByEmail(query: Query): Promise<ApiResponseDto<any>> {
+    const resPerPage = Number(query.pageSize) || 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = resPerPage * (currentPage - 1);
+
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.type_of_post', 'type_of_post')
+      .leftJoin('p.require', 'require')
+      .leftJoin('p.company', 'company')
+      .leftJoin('company.work_place', 'work_place')
+      .leftJoin('work_place.address', 'address')
+      .leftJoinAndSelect('p.applies', 'applies')
+      .leftJoin('applies.applicant', 'applicant')
+      .leftJoin('applicant.user', 'applicantUser')
+      .leftJoin('applies.post', 'post')
+      .leftJoin('applies.resume', 'resume')
+      .leftJoin('p.createBy', 'createBy')
+      .leftJoin('createBy.packages', 'packages')
+      .leftJoin('createBy.user', 'createUser');
+
+    queryBuilder.addSelect(['type_of_post.title', 'type_of_post.slug']);
+    queryBuilder.addSelect([
+      'require.gender',
+      'require.age',
+      'require.experience',
+      'require.level',
+      'require.quantity',
+      'require.education',
+      'require.description',
+    ]);
+    queryBuilder.addSelect([
+      'company.title',
+      'company.logo',
+      'company.scale',
+      'company.information',
+      'company.status',
+    ]);
+    queryBuilder.addSelect(['work_place.coordinate', 'work_place.latitude']);
+    queryBuilder.addSelect([
+      'address.national',
+      'address.city',
+      'address.district',
+      'address.village',
+    ]);
+
+    queryBuilder.addSelect([
+      'applies.letter',
+      'applies.status',
+      'applies.createAt',
+    ]);
+    queryBuilder.addSelect([
+      'applicant.id',
+      'applicantUser.id',
+      'applicantUser.avatar',
+      'applicantUser.username',
+      'applicantUser.email',
+      'applicantUser.role',
+    ]);
+    queryBuilder.addSelect(['post.title', 'post.description', 'post.views']);
+    queryBuilder.addSelect([
+      'resume.title',
+      'resume.job',
+      'resume.target',
+      'resume.image',
+      'resume.description',
+      'resume.status',
+    ]);
+    queryBuilder.addSelect(['createBy.social', 'createBy.news']);
+    queryBuilder.addSelect([
+      'createUser.username',
+      'createUser.email',
+      'createUser.role',
+    ]);
+    queryBuilder.addSelect(['packages.price', 'packages.news_quantity']);
+
+    // pagination
+    queryBuilder.take(resPerPage).skip(skip);
+
+    const [result] = await queryBuilder.getManyAndCount();
+
+    const filteredResult = result.filter(
+      (post) => post.createBy.user.email === query.email,
+    );
+
+    const totalPages = Math.ceil(filteredResult.length / resPerPage);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get all post by email successfully',
+      data: {
+        result: filteredResult,
+        totalItems: filteredResult.length,
+        totalPages: totalPages,
+        currentPage: currentPage,
+      },
+    };
+  }
+
   async findById(id: number): Promise<ApiResponseDto<any>> {
     const queryBuilder = this.postRepository
       .createQueryBuilder('p')
