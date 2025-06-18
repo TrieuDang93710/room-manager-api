@@ -92,6 +92,14 @@ export class PostController {
     return this.postService.findAll(query);
   }
 
+  @Get('/get-by-email')
+  async getPostsByEmail(
+    @Query()
+    query: ExpressQuery,
+  ) {
+    return this.postService.findAllByEmail(query);
+  }
+
   @Get('/:id')
   async getPost(
     @Param('id')

@@ -132,7 +132,10 @@ export class AuthService {
     });
 
     console.log('token: ', token);
-    await this.sendActivationEmail(newUser)
+    await this.sendActivationEmail(
+      newUser,
+      account_type && account_type[0] === 'google' ? passwordDefault : password,
+    )
       .then(() => {
         console.log('Activation email sent successfully');
       })
@@ -403,7 +406,7 @@ export class AuthService {
     }
   }
 
-  async sendActivationEmail(user: any): Promise<void> {
+  async sendActivationEmail(user: any, password?: string): Promise<void> {
     await this.mailerService.sendMail({
       to: user.email,
       from: 'trieu93710@donga.edu.vn',
@@ -411,6 +414,7 @@ export class AuthService {
       template: 'register',
       context: {
         name: user.username || user.email,
+        password: password,
         activationCode: user.code_id,
         userId: user.id,
         uriActivation: `http://localhost:8080/user/`,

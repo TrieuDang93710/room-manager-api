@@ -132,6 +132,66 @@ export class CompanyService {
     };
   }
 
+  async findAllByEmail(query: Query): Promise<ApiResponseDto<any>> {
+    const resPerPage = Number(query.pageSize) || 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = resPerPage * (currentPage - 1);
+
+    const queryBuilder = this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoin('company.posts', 'posts')
+      .leftJoin('posts.type_of_post', 'type_of_post')
+      .leftJoin('company.work_place', 'work_place')
+      .leftJoin('work_place.address', 'address')
+      .leftJoin('company.manager', 'manager')
+      .leftJoin('manager.user', 'user');
+
+    queryBuilder.addSelect([
+      'company.title',
+      'company.logo',
+      'company.description',
+      'company.scale',
+      'company.information',
+      'company.status',
+      'posts.title',
+      'posts.description',
+      'type_of_post.title',
+      'work_place.coordinate',
+      'work_place.latitude',
+      'address.national',
+      'address.district',
+      'address.city',
+      'address.village',
+      'manager.id',
+      'user.id',
+      'user.username',
+      'user.email',
+      'user.role',
+    ]);
+
+    // pagination
+    queryBuilder.take(resPerPage).skip(skip);
+
+    const [result] = await queryBuilder.getManyAndCount();
+
+    const filteredResult = result.filter(
+      (company) => company.manager.user.email === query.email,
+    );
+
+    const totalPages = Math.ceil(filteredResult.length / resPerPage);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Get all company successfully',
+      data: {
+        result: filteredResult,
+        totalItems: filteredResult.length,
+        totalPages: totalPages,
+        currentPage: currentPage,
+      },
+    };
+  }
+
   async findById(id: number): Promise<ApiResponseDto<any>> {
     const findCompany = await this.companyRepository.findOne({
       where: { id: Number(id) },

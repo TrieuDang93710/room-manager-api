@@ -30,6 +30,14 @@ export class CompanyController {
     return this.companyService.findAll(query);
   }
 
+  @Get('/get-by-email')
+  async getAllCompanyByEmail(
+    @Query()
+    query: ExpressQuery,
+  ) {
+    return this.companyService.findAllByEmail(query);
+  }
+
   @Post()
   @Roles(Role.MANAGER, Role.APPLICANT, Role.ADMIN)
   @UseGuards(AuthGuard(), RolesGuard)
